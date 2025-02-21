@@ -1,3 +1,6 @@
 PyQt6
 PyPubSub
 qasync
+pillow
+numpy
+opencv-python

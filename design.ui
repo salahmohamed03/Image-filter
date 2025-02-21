@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1290</width>
+    <width>1528</width>
     <height>793</height>
    </rect>
   </property>
@@ -25,7 +25,7 @@ flex-direction:column;
 }
 </string>
    </property>
-   <layout class="QHBoxLayout" name="mainHorizontalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QWidget" name="mainContentWidget" native="true">
       <property name="minimumSize">
@@ -52,133 +52,130 @@ flex-direction:column;
         <widget class="QWidget" name="imageDisplayContainer" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <widget class="QLabel" name="originalImageLabel">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color:#002333;
+           <widget class="QWidget" name="originalwidget" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <widget class="QLabel" name="originalImageLabel">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color:#002333;
 font-size:20px;
 </string>
-              </property>
-              <property name="text">
-               <string>Original Image</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QFrame" name="originalImageFrame">
-              <property name="styleSheet">
-               <string notr="true">background-color: white;
+               </property>
+               <property name="text">
+                <string>Original Image</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="OriginalImageLabel">
+               <property name="styleSheet">
+                <string notr="true">background-color: white;
 border-radius: 30px;
 border: 3px solid #002333;
 margin: 10px;  
 padding: 15px; 
 </string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_7">
-            <item>
-             <widget class="QLabel" name="outputOneLabel">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color:#002333;
+           <widget class="QWidget" name="out1widget" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QLabel" name="outputOneLabel">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color:#002333;
 font-size:20px;
 </string>
-              </property>
-              <property name="text">
-               <string>Output 1</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QFrame" name="outputOneFrame">
-              <property name="styleSheet">
-               <string notr="true">background-color: white;
+               </property>
+               <property name="text">
+                <string>Output 1</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="OutputImage1Label">
+               <property name="styleSheet">
+                <string notr="true">background-color: white;
 border-radius: 30px;
 border: 3px solid #002333;
 margin: 10px;  
 padding: 15px; 
 </string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_8">
-            <item>
-             <widget class="QLabel" name="outputTwoLabel">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color:#002333;
+           <widget class="QWidget" name="out2widget" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <widget class="QLabel" name="outputTwoLabel">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color:#002333;
 font-size:20px;
 </string>
-              </property>
-              <property name="text">
-               <string>Output 2</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QFrame" name="outputTwoFrame">
-              <property name="styleSheet">
-               <string notr="true">background-color: white;
+               </property>
+               <property name="text">
+                <string>Output 2</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="OutputImage2Label">
+               <property name="styleSheet">
+                <string notr="true">background-color: white;
 border-radius: 30px;
 border: 3px solid #002333;
 margin: 10px;  
 padding: 15px; 
 </string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -204,6 +201,43 @@ padding: 15px;
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="LoadImageButton">
+            <property name="minimumSize">
+             <size>
+              <width>300</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">
+QWidget QPushButton:hover {
+    background-color: #113444;
+};
+
+QWidget QPushButton:pressed {
+    background-color: #004455;
+}
+;
+background-color: #002333;
+border-radius: 10px;
+font-size: 16px;
+font-weight: bold;
+text-align: center;
+color:#DEEFE7;
+</string>
+            </property>
+            <property name="text">
+             <string>Load Image</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="resetButton">
@@ -241,19 +275,6 @@ color:#DEEFE7;
              <string>Reset</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
           <item>
            <widget class="QPushButton" name="grayScaleButton">
@@ -362,7 +383,7 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
           <bool>false</bool>
          </property>
          <property name="checkable">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <layout class="QVBoxLayout" name="mixerModeLayout">
           <property name="topMargin">
@@ -370,23 +391,6 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
           </property>
           <item>
            <layout class="QHBoxLayout" name="imageLoadButtonsLayout">
-            <item>
-             <widget class="QPushButton" name="loadImageOneButton">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 0);
-font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
-              </property>
-              <property name="text">
-               <string>Load Image 1</string>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QPushButton" name="loadImageTwoButton">
               <property name="minimumSize">
@@ -400,7 +404,24 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
 font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
               </property>
               <property name="text">
-               <string>Load Image 2</string>
+               <string>Mix With</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="generateHybridButton">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 0);
+font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
+              </property>
+              <property name="text">
+               <string>Applay</string>
               </property>
              </widget>
             </item>
@@ -456,23 +477,6 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
             </item>
            </layout>
           </item>
-          <item>
-           <widget class="QPushButton" name="generateHybridButton">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>50</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(0, 0, 0);
-font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
-            </property>
-            <property name="text">
-             <string>Generate Hybrid Image</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
@@ -489,6 +493,12 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
          </property>
          <layout class="QVBoxLayout" name="noiseModeLayout">
           <property name="topMargin">
@@ -688,6 +698,12 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
          </property>
          <property name="title">
           <string>Other Modes</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
          </property>
          <layout class="QVBoxLayout" name="otherModesOuterLayout">
           <property name="topMargin">
