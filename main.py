@@ -1,23 +1,22 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from gui import PubSubGUI
+
+from MainWindowUI import MainWindowUI
 from fourier import Fourier
-from image import Image
+from image_controller import Image
 import asyncio
-import qasync
-import Filters
 from qasync import QEventLoop
 
 async def main():
     fourier = Fourier()
     image = Image()
+
     
     app = QApplication(sys.argv)
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
     
-
-    window = PubSubGUI()
+    window = MainWindowUI()
     window.show()
     with loop:
         loop.run_forever()
