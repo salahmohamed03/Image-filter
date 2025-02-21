@@ -516,6 +516,14 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
               <property name="editable">
                <bool>false</bool>
               </property>
+              <property name="currentText">
+               <string>None</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>None</string>
+               </property>
+              </item>
               <item>
                <property name="text">
                 <string>Uniform</string>
@@ -528,7 +536,7 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
               </item>
               <item>
                <property name="text">
-                <string> salt &amp; pepper</string>
+                <string>Salt and Pepper</string>
                </property>
               </item>
              </widget>
@@ -602,6 +610,14 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
               <property name="styleSheet">
                <string notr="true">color: rgb(0, 0, 0);</string>
               </property>
+              <property name="currentText">
+               <string>None</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>None</string>
+               </property>
+              </item>
               <item>
                <property name="text">
                 <string>Average</string>
@@ -614,7 +630,7 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
               </item>
               <item>
                <property name="text">
-                <string> median filters</string>
+                <string>Median</string>
                </property>
               </item>
              </widget>
@@ -715,7 +731,7 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
          </property>
          <layout class="QVBoxLayout" name="otherModesOuterLayout">
           <property name="topMargin">
-           <number>7</number>
+           <number>20</number>
           </property>
           <item>
            <layout class="QVBoxLayout" name="otherModesInnerLayout">

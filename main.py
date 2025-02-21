@@ -5,11 +5,12 @@ from MainWindowUI import MainWindowUI
 from fourier import Fourier
 import asyncio
 from qasync import QEventLoop
+import Filters
 
 async def main():
     # Initialize classes
     fourier = Fourier()
-
+    Filters.bind_events()
     ###
     
     app = QApplication(sys.argv)

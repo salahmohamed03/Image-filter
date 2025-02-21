@@ -35,7 +35,7 @@ class Image:
 @lru_cache(maxsize=1)
 class Images:
     def __init__(self):
-        self.image1 = None
-        self.image2 = None
-        self.output1 = None
-        self.output2 = None
+        self.image1:Image = None
+        self.image2:Image = None
+        self.output1:Image = None
+        self.output2:Image = None
