@@ -18,8 +18,6 @@ class Fourier:
             pub.sendMessage("fourier calculated", result=f"this is fourier of ({image})")
             print(f"fourier calculated for {image}")
 
-
-
             
         loop = asyncio.get_event_loop()
         loop.create_task(calcFourier(image))

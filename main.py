@@ -2,16 +2,15 @@ import sys
 from PyQt6.QtWidgets import QApplication
 from gui import PubSubGUI
 from fourier import Fourier
+from image import Image
 import asyncio
 import qasync
 import Filters
 from qasync import QEventLoop
 
 async def main():
-    # Initialize classes
     fourier = Fourier()
-    filters = Filters.Filters()
-    ###
+    image = Image()
     
     app = QApplication(sys.argv)
     loop = QEventLoop(app)
