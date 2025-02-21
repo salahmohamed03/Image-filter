@@ -1,5 +1,4 @@
 from pubsub import pub
-
 class Filters:
     def __init__(self):
         self.bind_events()

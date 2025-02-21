@@ -13,7 +13,7 @@ class PubSubGUI(QWidget):
 
     def bind_events(self):
         pub.subscribe(self.updateViewer, "fourier calculated")
-        pub.subscribe(self.displayImage, "image uploaded")
+        pub.subscribe(self.save_image, "image uploaded")
         pub.subscribe(self.displayEdgedImage, "edges detected")
 
 
@@ -29,6 +29,7 @@ class PubSubGUI(QWidget):
         self.combo = QComboBox()
         self.combo.addItem("Sobel")
         self.combo.addItem("Perwitt")
+        self.combo.addItem("Robert")
         self.combo.addItem("Canney")
         
         
@@ -70,10 +71,12 @@ class PubSubGUI(QWidget):
         except Exception as e:
             print(e)
 
+    def save_image(self, image):
+        self.image = image
+        self.displayImage(image) 
+
     def displayImage(self, image):
         try:
-            # Save this images
-            self.image = image
 
             height, width, channel = image.shape
             bytes_per_line = 3 * width
@@ -91,6 +94,8 @@ class PubSubGUI(QWidget):
     def displayEdgedImage(self,results):
         try:
             x_edges, y_edges, filtered_image = results["x_edges"], results["y_edges"], results["filtered_image"]
+            print(x_edges)
+            
             def convert_to_displayable(edge_img):
                 # Ensure the image is uint8
                 if edge_img.dtype != np.uint8:
@@ -101,32 +106,34 @@ class PubSubGUI(QWidget):
                     edge_img = cv2.cvtColor(edge_img, cv2.COLOR_GRAY2RGB)
                 
                 return edge_img
-
-            # Convert both edge images
-            x_edges = convert_to_displayable(x_edges)
-            y_edges = convert_to_displayable(y_edges)
-            filtered_image= convert_to_displayable(filtered_image)
-
+            filtered_image = convert_to_displayable(filtered_image)
             self.displayImage(filtered_image)
 
-            x_height, x_width, channel = x_edges.shape
-            y_height, y_width, channel = y_edges.shape
-            x_bytes_per_line = 3 * x_width
-            y_bytes_per_line = 3 * y_width
+            if x_edges.all() == 0:
+                # Convert both edge images
+                x_edges = convert_to_displayable(x_edges)
+                y_edges = convert_to_displayable(y_edges)
 
-            # Create QImage (no need for BGR2RGB conversion since we already converted to RGB)
-            x_qt_image = QImage(x_edges.data, x_width, x_height, x_bytes_per_line, QImage.Format.Format_RGB888)
-            y_qt_image = QImage(y_edges.data, y_width, y_height, y_bytes_per_line, QImage.Format.Format_RGB888)
+                
 
-            # Create and scale pixmaps
-            x_pixmap = QPixmap.fromImage(x_qt_image)
-            y_pixmap = QPixmap.fromImage(y_qt_image)
-            x_scaled_pixmap = x_pixmap.scaled(300, 300, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
-            y_scaled_pixmap = y_pixmap.scaled(300, 300, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
+                x_height, x_width, channel = x_edges.shape
+                y_height, y_width, channel = y_edges.shape
+                x_bytes_per_line = 3 * x_width
+                y_bytes_per_line = 3 * y_width
 
-            # Display the images
-            self.edgeLabel.setPixmap(x_scaled_pixmap)
-            self.edge2Label.setPixmap(y_scaled_pixmap)
+                # Create QImage (no need for BGR2RGB conversion since we already converted to RGB)
+                x_qt_image = QImage(x_edges.data, x_width, x_height, x_bytes_per_line, QImage.Format.Format_RGB888)
+                y_qt_image = QImage(y_edges.data, y_width, y_height, y_bytes_per_line, QImage.Format.Format_RGB888)
+
+                # Create and scale pixmaps
+                x_pixmap = QPixmap.fromImage(x_qt_image)
+                y_pixmap = QPixmap.fromImage(y_qt_image)
+                x_scaled_pixmap = x_pixmap.scaled(300, 300, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
+                y_scaled_pixmap = y_pixmap.scaled(300, 300, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
+
+                # Display the images
+                self.edgeLabel.setPixmap(x_scaled_pixmap)
+                self.edge2Label.setPixmap(y_scaled_pixmap)
 
         except Exception as e:
             print(f"Error in displayEdgedImage: {e}")
