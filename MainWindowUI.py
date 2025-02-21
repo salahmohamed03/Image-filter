@@ -6,6 +6,14 @@ from PyQt6.QtGui import QPixmap,QImage
 from PyQt6.QtCore import Qt
 from pubsub import pub
 from Messages.Noise import Noise
+import logging
+
+logging.basicConfig(
+    filename="app.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    filemode="w"  # "w" overwrites the file; use "a" to append
+)
 
 class MainWindowUI(QMainWindow):
     def __init__(self):
@@ -16,6 +24,8 @@ class MainWindowUI(QMainWindow):
         self._bind_events()
         self._bind_ui_events()
         self.images = Images()
+        self.images.image1 = Image("test_images/Lenna.png")
+        self.update_output()
 
 
 
@@ -41,7 +51,18 @@ class MainWindowUI(QMainWindow):
         self.ui.cutoffFreqOneSlider.valueChanged.connect(self.update_mix_images)
         self.ui.cutoffFreqTwoSlider.valueChanged.connect(self.update_mix_images)
 
-    
+    def update_output(self):
+        if self.ui.mixerModeGroup.isChecked():
+            self.select_mode(1)
+        elif self.ui.noiseModeGroup.isChecked():
+            self.select_mode(2)
+        elif self.ui.otherModesGroup.isChecked():
+            self.select_mode(3)
+        elif self.ui.EdgeDetectionGroupBox.isChecked():
+            self.select_mode(4)
+        else:
+            self.select_mode(0)
+
     def update_noise(self):
         noise = Noise(
                 noise = self.ui.noiseTypeComboBox.currentText(),
@@ -50,12 +71,15 @@ class MainWindowUI(QMainWindow):
                 pepperRatio = self.ui.pepperNoiseSlider.value()/100
             )
         pub.sendMessage("Add Noise", noise = noise)
+        logging.info(f"Add Noise topic published Noise: {noise.noise} Filter: {noise.filter} Salt: {noise.saltRatio} Pepper: {noise.pepperRatio}")
 
     def update_edge_detection(self):
         pub.sendMessage("Edge Detection" , filter = self.ui.edgeDetectionComboBox.currentText())
+        logging.info(f"Edge Detection topic published Filter: {self.ui.edgeDetectionComboBox.currentText()}")
 
     def update_mix_images(self):
         pub.sendMessage("Mix Images", freq1 = self.ui.cutoffFreqOneSlider.value(), freq2 = self.ui.cutoffFreqTwoSlider.value())
+        logging.info(f"Mix Images topic published Freq1: {self.ui.cutoffFreqOneSlider.value()} Freq2: {self.ui.cutoffFreqTwoSlider.value()}")
 
     def upload_image1(self):
         image = self.upload_image()
@@ -144,6 +168,8 @@ class MainWindowUI(QMainWindow):
             self.ui.OutputImage2Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def select_mode(self,index):
+        self.OutputImage1Label.clear()
+        self.OutputImage2Label.clear()
         if index == 1:
             self.ui.noiseModeGroup.setChecked(False)
             self.ui.otherModesGroup.setChecked(False)
@@ -153,12 +179,6 @@ class MainWindowUI(QMainWindow):
             self.ui.mixerModeGroup.setChecked(False)
             self.ui.otherModesGroup.setChecked(False)
             self.ui.EdgeDetectionGroupBox.setChecked(False)
-            noise = Noise(
-                noise = self.ui.noiseTypeComboBox.currentText(),
-                filter = self.ui.filterTypeComboBox.currentText(),
-                saltRatio = self.ui.saltNoiseSlider.value()/100,
-                pepperRatio = self.ui.pepperNoiseSlider.value()/100
-            )
             self.update_noise()
         elif (index == 3 or ( 
                 not self.ui.mixerModeGroup.isChecked() 
@@ -173,12 +193,16 @@ class MainWindowUI(QMainWindow):
 
             if self.ui.normalizationRadioButton.isChecked():
                 pub.sendMessage("Normalize Image")
+                logging.info("Normalize Image topic published")
             elif self.ui.histogramRadioButton.isChecked():
                 pub.sendMessage("Histogram Equalization")
+                logging.info("Histogram Equalization topic published")
             elif self.ui.thresholdingRadioButton.isChecked():
                 pub.sendMessage("Thresholding")
+                logging.info("Thresholding topic published")
         else:
             self.ui.mixerModeGroup.setChecked(False)
             self.ui.noiseModeGroup.setChecked(False)
             self.ui.otherModesGroup.setChecked(False)
             self.update_edge_detection()
+        self.update_display()
