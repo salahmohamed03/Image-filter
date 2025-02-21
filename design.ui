@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1528</width>
+    <width>1250</width>
     <height>793</height>
    </rect>
   </property>
@@ -364,7 +364,7 @@ font-weight:bold;
 }
 </string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QGroupBox" name="mixerModeGroup">
          <property name="styleSheet">
@@ -405,23 +405,6 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
               </property>
               <property name="text">
                <string>Mix With</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="generateHybridButton">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 0);
-font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
-              </property>
-              <property name="text">
-               <string>Applay</string>
               </property>
              </widget>
             </item>
@@ -638,52 +621,77 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
             </item>
            </layout>
           </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="EdgeDetectionGroupBox">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 255, 255);
+border: 1px solid white;
+border-radius:10px;
+font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
+         </property>
+         <property name="title">
+          <string>Edge Detection</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <layout class="QHBoxLayout" name="edgeDetectionLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>3</number>
+          </property>
+          <property name="topMargin">
+           <number>20</number>
+          </property>
+          <property name="rightMargin">
+           <number>3</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
-           <layout class="QHBoxLayout" name="edgeDetectionLayout">
+           <widget class="QComboBox" name="edgeDetectionComboBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 0, 0);</string>
+            </property>
             <item>
-             <widget class="QLabel" name="label_3">
-              <property name="styleSheet">
-               <string notr="true">border:none;</string>
-              </property>
-              <property name="text">
-               <string>Edge Detection</string>
-              </property>
-             </widget>
+             <property name="text">
+              <string>Sobel</string>
+             </property>
             </item>
             <item>
-             <widget class="QComboBox" name="edgeDetectionComboBox">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 0);</string>
-              </property>
-              <item>
-               <property name="text">
-                <string>Sobel</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Roberts </string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Prewitt </string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Canny</string>
-               </property>
-              </item>
-             </widget>
+             <property name="text">
+              <string>Roberts </string>
+             </property>
             </item>
-           </layout>
+            <item>
+             <property name="text">
+              <string>Prewitt </string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Canny</string>
+             </property>
+            </item>
+           </widget>
           </item>
          </layout>
         </widget>

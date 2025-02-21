@@ -16,6 +16,7 @@ async def main():
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
     
+    
     window = MainWindowUI()
     window.show()
     with loop:
