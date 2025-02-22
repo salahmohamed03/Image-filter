@@ -8,6 +8,7 @@ from pubsub import pub
 from Messages.Noise import Noise
 import logging
 
+
 logging.basicConfig(
     filename="app.log",
     level=logging.INFO,
@@ -21,7 +22,8 @@ class MainWindowUI(QMainWindow):
         self.ui = uic.loadUi("design.ui", self)
         self.ui.show()
         self.ui.setWindowTitle("Image Filter")
-        self.hide_widget(self.ui.saltPepperWidget)
+        self.hide_Widget(self.ui.saltPepperWidget)
+        self.hide_Widget(self.ui.LoadingLabel)
         self._bind_events()
         self._bind_ui_events()
         self.images = Images()
@@ -32,7 +34,15 @@ class MainWindowUI(QMainWindow):
 
     def _bind_events(self):
         pub.subscribe(self.update_display, "update display")
-
+        pub.subscribe(self.end_loading, "update display")
+        pub.subscribe(self.start_loading, "start Loading")
+    def start_loading(self):
+        self.show_widget(self.ui.LoadingLabel)
+        logging.info("Loading started")
+        
+    def end_loading(self):
+        self.hide_Widget(self.ui.LoadingLabel)
+        logging.info("Loading ended")
 
     def _bind_ui_events(self):
         self.ui.LoadImageButton.clicked.connect(self.upload_image1)
@@ -89,25 +99,25 @@ class MainWindowUI(QMainWindow):
         if(not self.ui.mixerModeGroup.isChecked()):
             size = (440,400)
         piximage = QPixmap.fromImage(image.qimg.scaled(size[0],size[1]))
-        self.ui.OriginalImageLabel.setPixmap(piximage)
-        self.ui.OriginalImageLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.ui.OriginalImage1Label.setPixmap(piximage)
+        self.ui.OriginalImage1Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
     
     def upload_image2(self):
         image = self.upload_image()
         self.images.image2 = image
         piximage = QPixmap.fromImage(image.qimg.scaled(250,400))
-        self.ui.OutputImage1Label.setPixmap(piximage)
-        self.ui.OutputImage1Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.ui.OriginalImage2Label.setPixmap(piximage)
+        self.ui.OriginalImage2Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     
     @staticmethod
-    def hide_widget(widget):
-        widget.hide()
-        for child in widget.findChildren(QWidget):
+    def hide_Widget(Widget):
+        Widget.hide()
+        for child in Widget.findChildren(QWidget):
             child.hide()
-    def show_widget(self, widget):
-        widget.show()
-        for child in widget.findChildren(QWidget):
+    def show_widget(self, Widget):
+        Widget.show()
+        for child in Widget.findChildren(QWidget):
             child.show()
 
     def upload_image(self):
@@ -118,59 +128,79 @@ class MainWindowUI(QMainWindow):
     
     def update_display(self):
         if self.ui.mixerModeGroup.isChecked():
-            self.show_widget(self.ui.out1widget)
-            self.show_widget(self.ui.out2widget)
-            self.ui.outputOneLabel.setText("Image 2")
-            self.ui.originalImageLabel.setText("Image 1")
-            self.ui.outputTwoLabel.setText("Mixed")
+            self.show_widget(self.ui.Image2Widget)
+            self.hide_Widget(self.ui.Out2Widget)
+            self.hide_Widget(self.ui.Out3Widget)
+            self.ui.OriginalImage1Text.setText("Image 1")
+            self.ui.OriginalImage2Text.setText("Image 2")
+            self.ui.OutputImage1Text.setText("Mixed")
             size = (250,400)
         elif self.ui.EdgeDetectionGroupBox.isChecked():
-            self.show_widget(self.ui.out1widget)
-            self.show_widget(self.ui.out2widget)
-            self.ui.outputOneLabel.setText("Horizontal")
-            self.ui.originalImageLabel.setText("Original")
-            self.ui.outputTwoLabel.setText("Vertical")
+            self.show_widget(self.ui.Out2Widget)
+            self.show_widget(self.ui.Out3Widget)
+            self.hide_Widget(self.ui.Image2Widget)
+            self.ui.OriginalImage1Text.setText("Original")
+            self.ui.OutputImage2Text.setText("Horizontal")
+            self.ui.OutputImage1Text.setText("Vertical")
+            self.ui.OutputImage3Text.setText("Edge Detected")
             size = (250,400)
         elif self.ui.otherModesGroup.isChecked():
-            self.show_widget(self.ui.out1widget)
-            self.show_widget(self.ui.out2widget)
-            self.ui.originalImageLabel.setText("Original")
+            self.show_widget(self.ui.Out1Widget)
+            self.show_widget(self.ui.Out2Widget)
+            self.hide_Widget(self.ui.Out3Widget)
+            self.hide_Widget(self.ui.Image2Widget)
+            self.ui.OriginalImage1Text.setText("Original")
             if self.ui.normalizationRadioButton.isChecked():
-                self.ui.outputOneLabel.setText("Normalized")
-                self.ui.outputTwoLabel.setText("Equalized")
+                self.ui.OutputImage1Text.setText("Normalized")
+                sefl.ui.OutputImage2Text.setText("Equalized")
             elif self.ui.histogramRadioButton.isChecked():
-                self.ui.outputOneLabel.setText("Histogram")
-                self.ui.outputTwoLabel.setText("CDF")
+                self.ui.OutputImage1Text.setText("Histogram")
+                self.ui.OutputImage2Text.setText("CDF")
             elif self.ui.thresholdingRadioButton.isChecked():
-                self.ui.outputOneLabel.setText("Local")
-                self.ui.outputTwoLabel.setText("Global")
+                self.ui.OutputImage1Text.setText("Local")
+                self.ui.OutputImage2Text.setText("Global")
 
         else:
-            self.show_widget(self.ui.out1widget)
-            self.ui.originalImageLabel.setText("Original")
-            self.hide_widget(self.ui.out2widget)
-            self.ui.outputOneLabel.setText("Output")
+            self.hide_Widget(self.ui.Out2Widget)
+            self.hide_Widget(self.ui.Out3Widget)
+            self.hide_Widget(self.ui.Image2Widget)
+            self.ui.OriginalImage1Text.setText("Original")
+            self.ui.OutputImage1Text.setText("Output")
             size = (440,400)
             
         if self.images.image1:
             image = self.images.image1
             piximage = QPixmap.fromImage(image.qimg.scaled(size[0],size[1]))
-            self.ui.OriginalImageLabel.setPixmap(piximage)
-            self.ui.OriginalImageLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
+            self.ui.OriginalImage1Label.setPixmap(piximage)
+            self.ui.OriginalImage1Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        if self.images.output1 and not self.ui.mixerModeGroup.isChecked():
+        if self.images.image2:
+            image = self.images.image2
+            piximage = QPixmap.fromImage(image.qimg.scaled(250,400))
+            self.ui.OriginalImage2Label.setPixmap(piximage)
+            self.ui.OriginalImage2Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            
+        if self.images.output1:
             piximage = QPixmap.fromImage(self.images.output1.qimg.scaled(size[0],size[1]))
             self.ui.OutputImage1Label.setPixmap(piximage)
             self.ui.OutputImage1Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        if self.images.output2 and self.ui.mixerModeGroup.isChecked():
+        if self.images.output2:
             piximage = QPixmap.fromImage(self.images.output2.qimg.scaled(size[0],size[1]))
             self.ui.OutputImage2Label.setPixmap(piximage)
             self.ui.OutputImage2Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        if self.images.output3:
+            piximage = QPixmap.fromImage(self.images.output3.qimg.scaled(size[0],size[1]))
+            self.ui.OutputImage3Label.setPixmap(piximage)
+            self.ui.OutputImage3Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def select_mode(self,index):
         self.OutputImage1Label.clear()
         self.OutputImage2Label.clear()
+        self.OutputImage3Label.clear()
+        self.images.output1 = None
+        self.images.output2 = None
+        self.images.output3 = None
         if index == 1:
             self.ui.noiseModeGroup.setChecked(False)
             self.ui.otherModesGroup.setChecked(False)
@@ -207,3 +237,4 @@ class MainWindowUI(QMainWindow):
             self.ui.otherModesGroup.setChecked(False)
             self.update_edge_detection()
         self.update_display()
+

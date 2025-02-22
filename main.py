@@ -6,11 +6,13 @@ from fourier import Fourier
 import asyncio
 from qasync import QEventLoop
 import Filters
+from image_controller import ImageController
 
 async def main():
     # Initialize classes
     fourier = Fourier()
     Filters.bind_events()
+    image_controller = ImageController()
     ###
     
     app = QApplication(sys.argv)

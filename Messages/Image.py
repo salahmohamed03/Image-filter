@@ -39,3 +39,4 @@ class Images:
         self.image2:Image = None
         self.output1:Image = None
         self.output2:Image = None
+        self.output3:Image = None
