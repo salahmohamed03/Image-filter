@@ -21,6 +21,7 @@ class MainWindowUI(QMainWindow):
         self.ui = uic.loadUi("design.ui", self)
         self.ui.show()
         self.ui.setWindowTitle("Image Filter")
+        self.hide_widget(self.ui.saltPepperWidget)
         self._bind_events()
         self._bind_ui_events()
         self.images = Images()
