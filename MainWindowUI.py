@@ -3,7 +3,7 @@ from PyQt6 import uic
 from PyQt6.QtWidgets import QFileDialog
 from Messages.Image import Image , Images
 from PyQt6.QtGui import QPixmap,QImage
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from pubsub import pub
 from Messages.Noise import Noise
 import logging
@@ -22,6 +22,7 @@ class MainWindowUI(QMainWindow):
         self.ui = uic.loadUi("design.ui", self)
         self.ui.show()
         self.ui.setWindowTitle("Image Filter")
+        self.isLoading = False
         self.hide_Widget(self.ui.saltPepperWidget)
         self.hide_Widget(self.ui.LoadingLabel)
         self._bind_events()
@@ -38,10 +39,12 @@ class MainWindowUI(QMainWindow):
         pub.subscribe(self.start_loading, "start Loading")
     def start_loading(self):
         self.show_widget(self.ui.LoadingLabel)
+        self.isLoading = True
         logging.info("Loading started")
         
     def end_loading(self):
         self.hide_Widget(self.ui.LoadingLabel)
+        self.isLoading = False
         logging.info("Loading ended")
 
     def _bind_ui_events(self):
@@ -75,6 +78,9 @@ class MainWindowUI(QMainWindow):
             self.select_mode(0)
 
     def update_noise(self):
+        if self.isLoading:
+            QTimer.singleShot(100, self.update_noise)
+            return
         noise = Noise(
                 noise = self.ui.noiseTypeComboBox.currentText(),
                 filter = self.ui.filterTypeComboBox.currentText(),
@@ -85,10 +91,16 @@ class MainWindowUI(QMainWindow):
         logging.info(f"Add Noise topic published Noise: {noise.noise} Filter: {noise.filter} Salt: {noise.saltRatio} Pepper: {noise.pepperRatio}")
 
     def update_edge_detection(self):
+        if self.isLoading:
+            QTimer.singleShot(100, self.update_edge_detection)
+            return
         pub.sendMessage("Edge Detection" , filter = self.ui.edgeDetectionComboBox.currentText())
         logging.info(f"Edge Detection topic published Filter: {self.ui.edgeDetectionComboBox.currentText()}")
 
     def update_mix_images(self):
+        if self.isLoading:
+            QTimer.singleShot(100, self.update_mix_images)
+            return
         pub.sendMessage("Mix Images", freq1 = self.ui.cutoffFreqOneSlider.value(), freq2 = self.ui.cutoffFreqTwoSlider.value())
         logging.info(f"Mix Images topic published Freq1: {self.ui.cutoffFreqOneSlider.value()} Freq2: {self.ui.cutoffFreqTwoSlider.value()}")
 
