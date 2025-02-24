@@ -56,7 +56,7 @@ class MainWindowUI(QMainWindow):
         self.ui.EdgeDetectionGroupBox.clicked.connect(lambda: self.select_mode(4))
         self.ui.normalizationRadioButton.clicked.connect(self.update_display)
         self.ui.histogramRadioButton.clicked.connect(self.update_display)
-        self.ui.thresholdingRadioButton.clicked.connect(self.update_display)
+        self.ui.thresholdingRadioButton.clicked.connect(self.update_thresholding)
         self.ui.noiseTypeComboBox.currentIndexChanged.connect(self.update_noise)
         self.ui.filterTypeComboBox.currentIndexChanged.connect(self.update_noise)
         self.ui.saltNoiseSlider.valueChanged.connect(self.update_noise)
@@ -64,6 +64,7 @@ class MainWindowUI(QMainWindow):
         self.ui.edgeDetectionComboBox.currentIndexChanged.connect(self.update_edge_detection)
         self.ui.cutoffFreqOneSlider.valueChanged.connect(self.update_mix_images)
         self.ui.cutoffFreqTwoSlider.valueChanged.connect(self.update_mix_images)
+        
 
     def update_output(self):
         if self.ui.mixerModeGroup.isChecked():
@@ -96,6 +97,15 @@ class MainWindowUI(QMainWindow):
             return
         pub.sendMessage("Edge Detection" , filter = self.ui.edgeDetectionComboBox.currentText())
         logging.info(f"Edge Detection topic published Filter: {self.ui.edgeDetectionComboBox.currentText()}")
+    
+    def update_thresholding(self):
+        if self.isLoading:
+            QTimer.singleShot(100, self.update_edge_detection)
+            return
+        if self.images.image1:  
+            pub.sendMessage("Thresholding", image=self.images.image1)  
+            logging.info("Thresholding topic published")
+
 
     def update_mix_images(self):
         if self.isLoading:
@@ -164,13 +174,15 @@ class MainWindowUI(QMainWindow):
             self.ui.OriginalImage1Text.setText("Original")
             if self.ui.normalizationRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Normalized")
-                sefl.ui.OutputImage2Text.setText("Equalized")
+                self.ui.OutputImage2Text.setText("Equalized")
             elif self.ui.histogramRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Histogram")
                 self.ui.OutputImage2Text.setText("CDF")
             elif self.ui.thresholdingRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Local")
                 self.ui.OutputImage2Text.setText("Global")
+
+            size = (250,400)
 
         else:
             self.hide_Widget(self.ui.Out2Widget)
@@ -241,8 +253,9 @@ class MainWindowUI(QMainWindow):
                 pub.sendMessage("Histogram Equalization")
                 logging.info("Histogram Equalization topic published")
             elif self.ui.thresholdingRadioButton.isChecked():
-                pub.sendMessage("Thresholding")
-                logging.info("Thresholding topic published")
+                self.update_thresholding()
+
+
         else:
             self.ui.mixerModeGroup.setChecked(False)
             self.ui.noiseModeGroup.setChecked(False)

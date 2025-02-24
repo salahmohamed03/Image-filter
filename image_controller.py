@@ -26,8 +26,46 @@ class ImageController:
         # pub.subscribe(self.handle_histogram_equalization, "histogram equalization")
         # pub.subscribe(self.handle_image_normalizarion, "normalize image")  
         pub.subscribe(self.handel_detect_edges,"Edge Detection")
+        pub.subscribe(self.handel_thresholding,"Thresholding")
+
 
     
+
+    def handel_thresholding(self, image):
+        print("Debugging thresholding")
+        images = Images()
+        image_data = copy(image.image_data)
+        gray_image = cv2.cvtColor(image_data, cv2.COLOR_BGR2GRAY)
+
+        # Apply Local (Adaptive Mean) Thresholding
+        local_thresh = cv2.adaptiveThreshold(
+           gray_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2
+        )
+
+        # Apply Global (Otsu) Thresholding - Extract only the second item (thresholded image)
+        _,global_thresh = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        # Normalize the results to 0-255 range
+        local_thresh = cv2.normalize(local_thresh, None, 0, 255, cv2.NORM_MINMAX)
+        global_thresh = cv2.normalize(global_thresh, None, 0, 255, cv2.NORM_MINMAX)
+
+        # Convert back to uint8
+        local_thresh = local_thresh.astype(np.uint8)
+        global_thresh = global_thresh.astype(np.uint8)
+
+        # Convert grayscale images to BGR for display
+        local_thresh = cv2.cvtColor(local_thresh, cv2.COLOR_GRAY2BGR)
+        global_thresh = cv2.cvtColor(global_thresh, cv2.COLOR_GRAY2BGR)
+
+        # Convert images to displayable format
+        images.output1 = self.convert_to_displayable(local_thresh) 
+        images.output2 = self.convert_to_displayable(global_thresh)  
+
+
+        logging.info("Update display published from thresholding")
+        pub.sendMessage("update display")
+
+
 
     def handle_image_normalizarion(self, image):   
         pass
