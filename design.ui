@@ -593,7 +593,7 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
 font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
               </property>
               <property name="text">
-               <string>Cuttoff Frequency 1</string>
+               <string>Cuttoff Frequency</string>
               </property>
              </widget>
             </item>
@@ -604,31 +604,6 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
               </property>
               <property name="maximum">
                <number>100</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="cutoffTwoLayout">
-            <item>
-             <widget class="QLabel" name="label_32">
-              <property name="styleSheet">
-               <string notr="true">border:none;
-font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
-              </property>
-              <property name="text">
-               <string>Cuttoff Frequency 2</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSlider" name="cutoffFreqTwoSlider">
-              <property name="styleSheet">
-               <string notr="true">border:none;</string>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>

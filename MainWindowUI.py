@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow , QWidget
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
 from PyQt6 import uic
 from PyQt6.QtWidgets import QFileDialog
 from Messages.Image import Image , Images
@@ -6,6 +6,8 @@ from PyQt6.QtGui import QPixmap,QImage
 from PyQt6.QtCore import Qt, QTimer
 from pubsub import pub
 from Messages.Noise import Noise
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 import logging
 
 
@@ -22,6 +24,7 @@ class MainWindowUI(QMainWindow):
         self.ui = uic.loadUi("design.ui", self)
         self.ui.show()
         self.ui.setWindowTitle("Image Filter")
+        self.histogram = None
         self.isLoading = False
         self.hide_Widget(self.ui.saltPepperWidget)
         self.hide_Widget(self.ui.LoadingLabel)
@@ -37,6 +40,7 @@ class MainWindowUI(QMainWindow):
         pub.subscribe(self.update_display, "update display")
         pub.subscribe(self.end_loading, "update display")
         pub.subscribe(self.start_loading, "start Loading")
+        pub.subscribe(self.update_histogram, "display_histogram")
     def start_loading(self):
         self.show_widget(self.ui.LoadingLabel)
         self.isLoading = True
@@ -63,7 +67,7 @@ class MainWindowUI(QMainWindow):
         self.ui.pepperNoiseSlider.valueChanged.connect(self.update_noise)
         self.ui.edgeDetectionComboBox.currentIndexChanged.connect(self.update_edge_detection)
         self.ui.cutoffFreqOneSlider.valueChanged.connect(self.update_mix_images)
-        self.ui.cutoffFreqTwoSlider.valueChanged.connect(self.update_mix_images)
+        # self.ui.cutoffFreqTwoSlider.valueChanged.connect(self.update_mix_images)
         self.ui.normalizationRadioButton.clicked.connect(self.update_output)
         self.ui.histogramRadioButton.clicked.connect(self.update_output)
         self.ui.thresholdingRadioButton.clicked.connect(self.update_output)
@@ -71,6 +75,24 @@ class MainWindowUI(QMainWindow):
         self.ui.cutoffFrequencySlider.valueChanged.connect(self.update_freq_domain)
         self.ui.resetButton.clicked.connect(self.reset_images)
         self.ui.grayScaleButton.clicked.connect(self.convert_to_grayscale)
+
+    def update_histogram(self, canvas: FigureCanvasAgg):
+        self.histogram = FigureCanvas(canvas.figure)
+        layout = self.ui.imageDisplayContainer.layout()
+        if layout is None:
+            layout = QVBoxLayout(self.ui.imageDisplayContainer)
+        layout.addWidget(self.histogram)
+        print("Histogram displayed")
+
+    def remove_histogram(self):
+        layout = self.ui.imageDisplayContainer.layout()
+        if layout is not None:
+            if self.histogram:
+                layout.removeWidget(self.histogram)
+                self.histogram.deleteLater()
+                self.histogram = None
+                print("Histogram removed")
+
 
     def update_output(self):
         if self.ui.mixerModeGroup.isChecked():
@@ -139,8 +161,8 @@ class MainWindowUI(QMainWindow):
         if self.isLoading:
             QTimer.singleShot(100, self.update_mix_images)
             return
-        pub.sendMessage("Mix Images", freq1 = self.ui.cutoffFreqOneSlider.value(), freq2 = self.ui.cutoffFreqTwoSlider.value())
-        logging.info(f"Mix Images topic published Freq1: {self.ui.cutoffFreqOneSlider.value()} Freq2: {self.ui.cutoffFreqTwoSlider.value()}")
+        pub.sendMessage("Mix Images", freq1 = self.ui.cutoffFreqOneSlider.value(), freq2 = 0)
+        logging.info(f"Mix Images topic published Freq1: {self.ui.cutoffFreqOneSlider.value()} Freq2: {0}")
 
     def upload_image1(self):
         image = self.upload_image()
@@ -153,6 +175,7 @@ class MainWindowUI(QMainWindow):
         piximage = QPixmap.fromImage(image.qimg.scaled(size[0],size[1]))
         self.ui.OriginalImage1Label.setPixmap(piximage)
         self.ui.OriginalImage1Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.update_output()
     
     def upload_image2(self):
         image = self.upload_image()
@@ -162,6 +185,7 @@ class MainWindowUI(QMainWindow):
         piximage = QPixmap.fromImage(image.qimg.scaled(250,400))
         self.ui.OriginalImage2Label.setPixmap(piximage)
         self.ui.OriginalImage2Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.update_output()
 
     
     @staticmethod
@@ -181,8 +205,10 @@ class MainWindowUI(QMainWindow):
         return None
     
     def update_display(self):
+        # self.remove_histogram()
         if self.ui.mixerModeGroup.isChecked():
             self.show_widget(self.ui.Image2Widget)
+            self.show_widget(self.ui.Out1Widget)
             self.hide_Widget(self.ui.Out2Widget)
             self.hide_Widget(self.ui.Out3Widget)
             self.ui.OriginalImage1Text.setText("Image 1")
@@ -190,6 +216,7 @@ class MainWindowUI(QMainWindow):
             self.ui.OutputImage1Text.setText("Mixed")
             size = (250,400)
         elif self.ui.EdgeDetectionGroupBox.isChecked():
+            self.show_widget(self.ui.Out1Widget)
             self.show_widget(self.ui.Out2Widget)
             self.show_widget(self.ui.Out3Widget)
             self.hide_Widget(self.ui.Image2Widget)
@@ -208,8 +235,12 @@ class MainWindowUI(QMainWindow):
                 self.ui.OutputImage1Text.setText("Normalized")
                 self.ui.OutputImage2Text.setText("Equalized")
             elif self.ui.histogramRadioButton.isChecked():
-                self.ui.OutputImage1Text.setText("Histogram")
-                self.ui.OutputImage2Text.setText("CDF")
+                self.hide_Widget(self.ui.Out1Widget)
+                self.hide_Widget(self.ui.Out2Widget)
+                self.hide_Widget(self.ui.Out3Widget)
+
+                # self.ui.OutputImage1Text.setText("Histogram")
+                # self.ui.OutputImage2Text.setText("CDF")
             elif self.ui.thresholdingRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Local")
                 self.ui.OutputImage2Text.setText("Global")
@@ -218,6 +249,7 @@ class MainWindowUI(QMainWindow):
                 self.ui.OutputImage2Text.setText("High Pass")
             size = (250,400)
         else:
+            self.show_widget(self.ui.Out1Widget)
             self.hide_Widget(self.ui.Out2Widget)
             self.hide_Widget(self.ui.Out3Widget)
             self.hide_Widget(self.ui.Image2Widget)
@@ -255,6 +287,7 @@ class MainWindowUI(QMainWindow):
         self.OutputImage1Label.clear()
         self.OutputImage2Label.clear()
         self.OutputImage3Label.clear()
+        self.remove_histogram()
         self.images.output1 = None
         self.images.output2 = None
         self.images.output3 = None
