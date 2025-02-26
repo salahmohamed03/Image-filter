@@ -108,16 +108,25 @@ class ImageController:
 
         equalized_image = normalized_cdf[image_data]
         equalized_image = cv2.cvtColor(equalized_image, cv2.COLOR_GRAY2BGR)
-        images.output1 = self.convert_to_displayable(equalized_image)
+        
+        normalized_image = self.normalize_image(image_data)
+        images.output1 = self.convert_to_displayable(normalized_image)
+        images.output2 = self.convert_to_displayable(equalized_image)
+        
         logging.info("Update display published from equalization")
         pub.sendMessage("update display")
 
+    
     def calculate_histogram(self, image_data):
         histogram = np.zeros(256, dtype=np.int32)
         for pixel in image_data.flatten():
                 histogram[pixel] += 1
         return histogram
     
+    def normalize_image(self, image_data):
+        normalized_image = (image_data - np.min(image_data)) / (np.max(image_data) - np.min(image_data))
+        return normalized_image
+
     def handle_thresholding(self):
         print("Debugging thresholding")
         images = Images()
