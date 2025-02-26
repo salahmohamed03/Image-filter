@@ -166,7 +166,7 @@ class MainWindowUI(QMainWindow):
             self.ui.OriginalImage1Text.setText("Original")
             if self.ui.normalizationRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Normalized")
-                sefl.ui.OutputImage2Text.setText("Equalized")
+                self.ui.OutputImage2Text.setText("Equalized")
             elif self.ui.histogramRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Histogram")
                 self.ui.OutputImage2Text.setText("CDF")
