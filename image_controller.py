@@ -26,6 +26,7 @@ class ImageController:
 
     def bind_events(self):
         # This is all the events that this class is listening to
+        pub.subscribe(self.handle_equalization, "Normalize Image")
         pub.subscribe(self.handle_distribution_curve, "Histogram Equalization")
         pub.subscribe(self.handle_detect_edges,"Edge Detection")
         pub.subscribe(self.handle_thresholding,"Thresholding")
@@ -90,7 +91,32 @@ class ImageController:
             print(f"Error in handle_distribution_curve: {str(e)}")
             import traceback
             traceback.print_exc()
+    
+    def handle_equalization(self):
+        images = Images()
+        image_data = images.image1.image_data
+        image_data =cv2.cvtColor(image_data, cv2.COLOR_BGR2GRAY)
+        
+        histogram = cv2.calcHist([image_data], [0], None, [256], [0, 256]).flatten()
+        cdf = histogram.cumsum()
+        cdf_min = cdf.min()
+        cdf_max = cdf.max()
+        normalized_cdf = (cdf - cdf_min) / (cdf_max - cdf_min) * 255
 
+
+        equalized_image = normalized_cdf[image_data]
+        equalized_image = cv2.cvtColor(equalized_image, cv2.COLOR_GRAY2BGR)
+        images.output1 = self.convert_to_displayable(equalized_image)
+        logging.info("Update display published from equalization")
+        pub.sendMessage("update display")
+
+    def calculate_histogram(self, image_data):
+        histogram = np.zeros(256, dtype=np.int32)
+        for row in range(image_data.shape[0]):
+            for col in range(image_data.shape[1]):
+                pixel = image_data[row, col]
+                histogram[pixel] += 1
+        return histogram
     
     def handle_thresholding(self):
         print("Debugging thresholding")
@@ -231,7 +257,7 @@ class ImageController:
 
         logging.info("update display publised from detect edges")
         pub.sendMessage("update display")
-        
+
 
     @staticmethod
     def convert_to_displayable(edge_img):
