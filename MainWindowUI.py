@@ -64,6 +64,11 @@ class MainWindowUI(QMainWindow):
         self.ui.edgeDetectionComboBox.currentIndexChanged.connect(self.update_edge_detection)
         self.ui.cutoffFreqOneSlider.valueChanged.connect(self.update_mix_images)
         self.ui.cutoffFreqTwoSlider.valueChanged.connect(self.update_mix_images)
+        self.ui.normalizationRadioButton.clicked.connect(self.update_output)
+        self.ui.histogramRadioButton.clicked.connect(self.update_output)
+        self.ui.thresholdingRadioButton.clicked.connect(self.update_output)
+        self.ui.freqDomainRadioButton.clicked.connect(self.update_output)
+        self.ui.cutoffFrequencySlider.valueChanged.connect(self.update_output)
 
     def update_output(self):
         if self.ui.mixerModeGroup.isChecked():
@@ -173,6 +178,9 @@ class MainWindowUI(QMainWindow):
             elif self.ui.thresholdingRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Local")
                 self.ui.OutputImage2Text.setText("Global")
+            elif self.freqDomainRadioButton.isChecked():
+                self.ui.OutputImage1Text.setText("Low Pass")
+                self.ui.OutputImage2Text.setText("High Pass")
             size = (250,400)
         else:
             self.hide_Widget(self.ui.Out2Widget)
@@ -245,6 +253,9 @@ class MainWindowUI(QMainWindow):
             elif self.ui.thresholdingRadioButton.isChecked():
                 pub.sendMessage("Thresholding")
                 logging.info("Thresholding topic published")
+            elif self.freqDomainRadioButton.isChecked():
+                pub.sendMessage("Frequency Filters", cutoff = self.ui.cutoffFrequencySlider.value())
+                logging.info("Frequency Domain topic published")
         else:
             self.ui.mixerModeGroup.setChecked(False)
             self.ui.noiseModeGroup.setChecked(False)
