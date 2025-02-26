@@ -68,7 +68,9 @@ class MainWindowUI(QMainWindow):
         self.ui.histogramRadioButton.clicked.connect(self.update_output)
         self.ui.thresholdingRadioButton.clicked.connect(self.update_output)
         self.ui.freqDomainRadioButton.clicked.connect(self.update_output)
-        self.ui.cutoffFrequencySlider.valueChanged.connect(self.update_output)
+        self.ui.cutoffFrequencySlider.valueChanged.connect(self.update_freq_domain)
+        self.ui.resetButton.clicked.connect(self.reset_images)
+        self.ui.grayScaleButton.clicked.connect(self.convert_to_grayscale)
 
     def update_output(self):
         if self.ui.mixerModeGroup.isChecked():
@@ -81,6 +83,28 @@ class MainWindowUI(QMainWindow):
             self.select_mode(4)
         else:
             self.select_mode(0)
+    def update_freq_domain(self):
+        if not self.ui.freqDomainRadioButton.isChecked():
+            return
+        pub.sendMessage("Frequency Filters", cutoff = self.ui.cutoffFrequencySlider.value())
+        logging.info("Frequency Domain topic published")
+
+    def convert_to_grayscale(self):
+        pub.sendMessage("Grayscale")
+        logging.info("Grayscale topic published")
+
+    def reset_images(self):
+        self.images.image1 = None
+        self.images.image2 = None
+        self.images.output1 = None
+        self.images.output2 = None
+        self.images.output3 = None
+        self.OriginalImage1Label.clear()
+        self.OriginalImage2Label.clear()
+        self.OutputImage1Label.clear()
+        self.OutputImage2Label.clear()
+        self.OutputImage3Label.clear()
+        logging.info("Images reset")
 
     def update_noise(self):
         if self.isLoading:
@@ -116,6 +140,7 @@ class MainWindowUI(QMainWindow):
         size = (250,400)
         if(not self.ui.mixerModeGroup.isChecked()):
             size = (440,400)
+        image.resize((512, 512))
         piximage = QPixmap.fromImage(image.qimg.scaled(size[0],size[1]))
         self.ui.OriginalImage1Label.setPixmap(piximage)
         self.ui.OriginalImage1Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -124,6 +149,7 @@ class MainWindowUI(QMainWindow):
         image = self.upload_image()
         if image is None: return
         self.images.image2 = image
+        image.resize((512, 512))
         piximage = QPixmap.fromImage(image.qimg.scaled(250,400))
         self.ui.OriginalImage2Label.setPixmap(piximage)
         self.ui.OriginalImage2Label.setAlignment(Qt.AlignmentFlag.AlignCenter)

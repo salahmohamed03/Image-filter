@@ -602,6 +602,9 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
               <property name="styleSheet">
                <string notr="true">border:none;</string>
               </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>

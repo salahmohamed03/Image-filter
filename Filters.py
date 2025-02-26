@@ -57,15 +57,17 @@ def add_salt_and_pepper_noise (qimage):
     width = qimage.width()
     height= qimage.height()
     #########3
-    ptr =   qimage.bits()
-    ptr.setsize(height * qimage.bytesPerLine())
+    ptr = qimage.bits()
+    bytes_per_line = qimage.bytesPerLine()
+    ptr.setsize(height * bytes_per_line)
 
-    channels = qimage.bytesPerLine() // width
+    bytes_per_line = qimage.bytesPerLine()
+    channels = bytes_per_line // width
     print(channels)
     
     # Reshape the data accordingly
     try:
-        arr = np.array(ptr).reshape(height, width, channels)
+        arr = np.array(ptr).reshape(height, bytes_per_line)[:, :width * channels].reshape(height, width, channels)
     except Exception as e:
         print("Reshape error:", e)
         raise
@@ -77,7 +79,7 @@ def add_salt_and_pepper_noise (qimage):
     arr[rnd> 1-prob/2] = 255  # this is the salt
 
     #the array is modified , now we make a new qimage from it 
-    new_image = QImage(arr.data, width, height, qimage.bytesPerLine(), qimage.format())
+    new_image = QImage(arr.tobytes(), width, height, qimage.bytesPerLine(), qimage.format())
     return new_image
 
 def add_uniform_noise(qimage):
@@ -91,9 +93,10 @@ def add_uniform_noise(qimage):
     ptr.setsize(height * qimage.bytesPerLine())
     
     # Determine the number of channels dynamically
-    channels = qimage.bytesPerLine() // width
+    bytes_per_line = qimage.bytesPerLine()
     try:
-        arr = np.array(ptr).reshape(height, width, channels)
+        arr = np.array(ptr).reshape(height, bytes_per_line)[:, :width * (bytes_per_line // width)]
+        arr = arr.reshape(height, width, bytes_per_line // width)
     except Exception as e:
         print("Reshape error in add_uniform_noise:", e)
         raise

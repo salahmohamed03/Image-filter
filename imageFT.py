@@ -6,6 +6,7 @@ from pubsub import pub
 import asyncio
 import concurrent.futures
 from Messages.Image import Image,Images
+from image_controller import ImageController
 import logging
 logging.basicConfig(
     filename="app.log",
@@ -28,6 +29,7 @@ class ImageFT:
     def _bind_events(self):
         pub.subscribe(self.handel_mix_images, "Mix Images")
         pub.subscribe(self.handel_freq_filter, "Frequency Filters")
+        pub.subscribe(self.handel_grayscale, "Grayscale")
 
     @staticmethod
     def _resize_to_match(img1, img2):
@@ -99,10 +101,10 @@ class ImageFT:
         
         if filter_type == "lpf":
             # Low-pass filter: 1 for frequencies below cutoff, 0 for frequencies above
-            mask = center_dist <= cutoff
+            mask = center_dist < cutoff
         elif filter_type == "hpf":
             # High-pass filter: 0 for frequencies below cutoff, 1 for frequencies above
-            mask = center_dist > cutoff
+            mask = center_dist >= cutoff
         
         return mask.astype(float)
     
@@ -241,12 +243,13 @@ class ImageFT:
         Images().output1 = output
         pub.sendMessage("update display")
     def handel_freq_filter(self, cutoff):
-        pub.sendMessage("start Loading")
-        # Create a thread pool executor
-        executor = concurrent.futures.ThreadPoolExecutor()
-        loop = asyncio.get_event_loop()
-        # Run the CPU-intensive task in a separate thread
-        loop.run_in_executor(executor, self.apply_filters, cutoff)
+        # pub.sendMessage("start Loading")
+        # # Create a thread pool executor
+        # executor = concurrent.futures.ThreadPoolExecutor()
+        # loop = asyncio.get_event_loop()
+        # # Run the CPU-intensive task in a separate thread
+        # loop.run_in_executor(executor, self.apply_filters, cutoff)
+        self.apply_filters(cutoff)
 
     def apply_filters(self, cutoff):
         logging.info("Applying frequency filters")
@@ -259,3 +262,28 @@ class ImageFT:
         Images().output1 = output1
         Images().output2 = output2
         pub.sendMessage("update display")
+    
+    def convert_to_grayscale(self, image):
+        if len(image.shape) == 2:
+            return image  # Already grayscale
+            
+        # Convert RGB to grayscale using luminosity method
+        weights = np.array([0.2989, 0.5870, 0.1140])
+        grayscale = np.dot(image[..., :3], weights)
+        return grayscale.astype(np.uint8)
+    
+    def handel_grayscale(self):
+        if Images().image1 is not None:
+            image = Images().image1.image_data
+            result = self.convert_to_grayscale(image)
+            output = ImageController().convert_to_displayable(result)
+            Images().image1 = output
+
+        if Images().image2 is not None:
+            image = Images().image2.image_data
+            result = self.convert_to_grayscale(image)
+            output = ImageController().convert_to_displayable(result)
+            Images().image2 = output
+
+        pub.sendMessage("update display")
+    
