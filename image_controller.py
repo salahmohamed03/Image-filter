@@ -31,9 +31,10 @@ class ImageController:
 
     
 
-    def handel_thresholding(self, image):
+    def handel_thresholding(self):
         print("Debugging thresholding")
         images = Images()
+        image = copy(images.image1)
         image_data = copy(image.image_data)
         gray_image = cv2.cvtColor(image_data, cv2.COLOR_BGR2GRAY)
 

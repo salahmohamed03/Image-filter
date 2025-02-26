@@ -100,7 +100,7 @@ class MainWindowUI(QMainWindow):
     
     def update_thresholding(self):
         if self.isLoading:
-            QTimer.singleShot(100, self.update_edge_detection)
+            QTimer.singleShot(100, self.update_thresholding)
             return
         if self.images.image1:  
             pub.sendMessage("Thresholding", image=self.images.image1)  
