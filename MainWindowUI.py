@@ -64,7 +64,13 @@ class MainWindowUI(QMainWindow):
         self.ui.edgeDetectionComboBox.currentIndexChanged.connect(self.update_edge_detection)
         self.ui.cutoffFreqOneSlider.valueChanged.connect(self.update_mix_images)
         self.ui.cutoffFreqTwoSlider.valueChanged.connect(self.update_mix_images)
-        
+        self.ui.normalizationRadioButton.clicked.connect(self.update_output)
+        self.ui.histogramRadioButton.clicked.connect(self.update_output)
+        self.ui.thresholdingRadioButton.clicked.connect(self.update_output)
+        self.ui.freqDomainRadioButton.clicked.connect(self.update_output)
+        self.ui.cutoffFrequencySlider.valueChanged.connect(self.update_freq_domain)
+        self.ui.resetButton.clicked.connect(self.reset_images)
+        self.ui.grayScaleButton.clicked.connect(self.convert_to_grayscale)
 
     def update_output(self):
         if self.ui.mixerModeGroup.isChecked():
@@ -77,6 +83,28 @@ class MainWindowUI(QMainWindow):
             self.select_mode(4)
         else:
             self.select_mode(0)
+    def update_freq_domain(self):
+        if not self.ui.freqDomainRadioButton.isChecked():
+            return
+        pub.sendMessage("Frequency Filters", cutoff = self.ui.cutoffFrequencySlider.value())
+        logging.info("Frequency Domain topic published")
+
+    def convert_to_grayscale(self):
+        pub.sendMessage("Grayscale")
+        logging.info("Grayscale topic published")
+
+    def reset_images(self):
+        self.images.image1 = None
+        self.images.image2 = None
+        self.images.output1 = None
+        self.images.output2 = None
+        self.images.output3 = None
+        self.OriginalImage1Label.clear()
+        self.OriginalImage2Label.clear()
+        self.OutputImage1Label.clear()
+        self.OutputImage2Label.clear()
+        self.OutputImage3Label.clear()
+        logging.info("Images reset")
 
     def update_noise(self):
         if self.isLoading:
@@ -103,7 +131,7 @@ class MainWindowUI(QMainWindow):
             QTimer.singleShot(100, self.update_thresholding)
             return
         if self.images.image1:  
-            pub.sendMessage("Thresholding", image=self.images.image1)  
+            pub.sendMessage("Thresholding")  
             logging.info("Thresholding topic published")
 
 
@@ -116,17 +144,21 @@ class MainWindowUI(QMainWindow):
 
     def upload_image1(self):
         image = self.upload_image()
+        if image is None: return
         self.images.image1 = image
         size = (250,400)
         if(not self.ui.mixerModeGroup.isChecked()):
             size = (440,400)
+        image.resize((512, 512))
         piximage = QPixmap.fromImage(image.qimg.scaled(size[0],size[1]))
         self.ui.OriginalImage1Label.setPixmap(piximage)
         self.ui.OriginalImage1Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
     
     def upload_image2(self):
         image = self.upload_image()
+        if image is None: return
         self.images.image2 = image
+        image.resize((512, 512))
         piximage = QPixmap.fromImage(image.qimg.scaled(250,400))
         self.ui.OriginalImage2Label.setPixmap(piximage)
         self.ui.OriginalImage2Label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -181,9 +213,10 @@ class MainWindowUI(QMainWindow):
             elif self.ui.thresholdingRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Local")
                 self.ui.OutputImage2Text.setText("Global")
-
+            elif self.freqDomainRadioButton.isChecked():
+                self.ui.OutputImage1Text.setText("Low Pass")
+                self.ui.OutputImage2Text.setText("High Pass")
             size = (250,400)
-
         else:
             self.hide_Widget(self.ui.Out2Widget)
             self.hide_Widget(self.ui.Out3Widget)
@@ -253,9 +286,11 @@ class MainWindowUI(QMainWindow):
                 pub.sendMessage("Histogram Equalization")
                 logging.info("Histogram Equalization topic published")
             elif self.ui.thresholdingRadioButton.isChecked():
-                self.update_thresholding()
-
-
+                pub.sendMessage("Thresholding")
+                logging.info("Thresholding topic published")
+            elif self.freqDomainRadioButton.isChecked():
+                pub.sendMessage("Frequency Filters", cutoff = self.ui.cutoffFrequencySlider.value())
+                logging.info("Frequency Domain topic published")
         else:
             self.ui.mixerModeGroup.setChecked(False)
             self.ui.noiseModeGroup.setChecked(False)

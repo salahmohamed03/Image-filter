@@ -15,10 +15,10 @@ class Image:
             self.qimg, self.image_data = Image.load_image(path)
 
     def resize(self, new_size):
-        self.image_data.resize(new_size,refcheck=False)
+        self.image_data = cv2.resize(self.image_data, (new_size[0], new_size[1]))
         height, width, channel = self.image_data.shape
         bytes_per_line = 3 * width
-        self.qimg = QImage(self.image_data,width, height, bytes_per_line, QImage.Format.Format_RGB888)
+        self.qimg = QImage(self.image_data, width, height, bytes_per_line, QImage.Format.Format_RGB888)
    
     @staticmethod
     def load_image(path):

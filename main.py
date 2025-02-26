@@ -7,12 +7,14 @@ import asyncio
 from qasync import QEventLoop
 import Filters
 from image_controller import ImageController
+from imageFT import ImageFT
 
 async def main():
     # Initialize classes
     fourier = Fourier()
     Filters.bind_events()
     image_controller = ImageController()
+    imageft = ImageFT()
     ###
     
     app = QApplication(sys.argv)
