@@ -32,64 +32,70 @@ class ImageController:
 
     
     def handle_distribution_curve(self):
-        # Access the image data
-        images= Images()
-        image_data = images.image1.image_data 
-
-        print("start drawing....")
-        
-        # red_histo = []
-        # green_histo = []
-        # blue_histo = []
-
-        fig = plt.figure(figsize=(10, 6))
-        plt.title("RGB Color Histogram")
-        plt.xlabel("Pixel Intensity")
-        plt.ylabel("Frequency")
-        
-        # Define colors for plotting
-        colors = ('b', 'g', 'r')
-        channel_names = ('Blue', 'Green', 'Red')
-        
-        # Plot histogram for each color channel
-        for i, color in enumerate(colors):
-            # Calculate histogram for the specific channel
-            histogram = cv2.calcHist([image_data], [i], None, [256], [0, 256])
+        try:
+            # Access the image data
+            images = Images()
+            image_data = images.image1.image_data 
             
-            # Normalize histogram for better visualization
-            histogram = histogram / histogram.max()
+            print("start drawing....")
             
-            # Plot the histogram with proper label
-            plt.plot(histogram, color=color, label=channel_names[i])
-        
-        # Add a legend to distinguish channels
-        plt.legend()
-        
-        # Set the x-axis limits
-        plt.xlim([0, 256])
-        
-        # Show grid for better readability
-        plt.grid(alpha=0.3)
-        
-        # Show the plot
-        plt.tight_layout()
-        plt.show()
+            # Check if image data is valid
+            if image_data is None or len(image_data.shape) < 3:
+                print("Invalid image data")
+                return
+                
+            fig, axes = plt.subplots(3, 2, figsize=(12, 10))
+            fig.patch.set_facecolor('black')
 
+            results = {}
+            colors = ("r", "g", "b")
+            color_channels = ("Red", "Green", "Blue")
 
-        # Convert it into image         # Convert Matplotlib plot to QImage
-        # buf = BytesIO()
-        # plt.savefig(buf, format="png", bbox_inches='tight')
-        # plt.close()
-        # buf.seek(0)
+            for i, (color, channel_name) in enumerate(zip(colors, color_channels)):
+                histogram = cv2.calcHist([image_data], [i], None, [256], [0, 256]).flatten()
+                cdf = histogram.cumsum()
+                cdf = cdf / cdf.max() * histogram.max()  # Normalize CDF for better visualization
+                
+                results[channel_name] = {"histogram": histogram, "cdf": cdf}
 
-        # qimage = QImage.fromData(buf.getvalue())
+                for ax in axes[i]:
+                    ax.set_facecolor("black")
+                    ax.tick_params(axis='x', colors="white")
+                    ax.tick_params(axis='y', colors="white")
+                    ax.spines["bottom"].set_color("white")
+                    ax.spines["left"].set_color("white")
 
+                # Plot and fill histogram
+                axes[i, 0].fill_between(range(256), histogram, color=color, alpha=0.4)
+                axes[i, 0].plot(histogram, color=color, linewidth=1.5)
+                axes[i, 0].set_title(f"{channel_name} Histogram", color="white")
+                axes[i, 0].set_xlabel("Pixel Intensity", color="white")
+                axes[i, 0].set_ylabel("Normalized Frequency", color="white")
+                axes[i, 0].set_xlim([0, 256])
+                axes[i, 0].grid(alpha=0.3, color="gray")
+
+                # Plot and fill CDF
+                axes[i, 1].fill_between(range(256), cdf, color=color, alpha=0.4)
+                axes[i, 1].plot(cdf, color=color, linewidth=1.5)
+                axes[i, 1].set_title(f"{channel_name} CDF", color="white")
+                axes[i, 1].set_xlabel("Pixel Intensity", color="white")
+                axes[i, 1].set_ylabel("Cumulative Frequency", color="white")
+                axes[i, 1].set_xlim([0, 256])
+                axes[i, 1].grid(alpha=0.3, color="gray")
+
+            # Adjust layout
+            plt.tight_layout()
+            fig.subplots_adjust(top=0.92)
+            plt.show()
 
         #images.output1 = self.convert_to_displayable(hist)
+        #pub.sendMessage("update display")
+        except Exception as e:
+            print(f"Error in handle_distribution_curve: {str(e)}")
+            import traceback
+            traceback.print_exc()
 
-
-        pub.sendMessage("update display")
-            
+        
 
     def handle_image_normalizarion(self, image):   
         pass
