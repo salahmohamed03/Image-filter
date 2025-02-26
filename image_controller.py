@@ -26,10 +26,9 @@ class ImageController:
 
     def bind_events(self):
         # This is all the events that this class is listening to
-        
         pub.subscribe(self.handle_distribution_curve, "Histogram Equalization")
-        pub.subscribe(self.handel_detect_edges,"Edge Detection")
-        pub.subscribe(self.handel_thresholding,"Thresholding")
+        pub.subscribe(self.handle_detect_edges,"Edge Detection")
+        pub.subscribe(self.handle_thresholding,"Thresholding")
 
 
     
@@ -38,10 +37,7 @@ class ImageController:
             # Access the image data
             images = Images()
             image_data = images.image1.image_data 
-            
-            print("start drawing....")
-            
-            # Check if image data is valid
+                        
             if image_data is None or len(image_data.shape) < 3:
                 print("Invalid image data")
                 return
@@ -49,17 +45,14 @@ class ImageController:
             fig, axes = plt.subplots(3, 2, figsize=(12, 10))
             fig.patch.set_facecolor('black')
 
-            results = {}
-            colors = ("r", "g", "b")
-            color_channels = ("Red", "Green", "Blue")
+            colors = ("b", "g", "r")
+            color_channels = ("Blue", "Green", "Red")
 
             for i, (color, channel_name) in enumerate(zip(colors, color_channels)):
                 histogram = cv2.calcHist([image_data], [i], None, [256], [0, 256]).flatten()
                 cdf = histogram.cumsum()
                 cdf = cdf / cdf.max() * histogram.max()  # Normalize CDF for better visualization
                 
-                results[channel_name] = {"histogram": histogram, "cdf": cdf}
-
                 for ax in axes[i]:
                     ax.set_facecolor("black")
                     ax.tick_params(axis='x', colors="white")
@@ -88,18 +81,18 @@ class ImageController:
             # Adjust layout
             plt.tight_layout()
             fig.subplots_adjust(top=0.92)
-            plt.show()
 
-        #images.output1 = self.convert_to_displayable(hist)
-        #pub.sendMessage("update display")
+            canvas = FigureCanvasAgg(fig)
+            pub.sendMessage("display_histogram", canvas=canvas)
+
+        
         except Exception as e:
             print(f"Error in handle_distribution_curve: {str(e)}")
             import traceback
             traceback.print_exc()
 
-        
-
-    def handel_thresholding(self):
+    
+    def handle_thresholding(self):
         print("Debugging thresholding")
         images = Images()
         image = copy(images.image1)
@@ -135,24 +128,7 @@ class ImageController:
         pub.sendMessage("update display")
 
 
-
-    def handle_image_normalizarion(self, image):   
-        pass
-
-    def handle_histogram_equalization(self, image):
-        pass
-
-
-
-
-    def handle_upload_image(self, image_path):
-        try:
-            image = cv2.imread(image_path)
-            pub.sendMessage("image uploaded", image=image)
-        except Exception as e:
-            print(e)
-
-    def handel_detect_edges(self, filter):
+    def handle_detect_edges(self, filter):
         pub.sendMessage("start Loading")
         # Create a thread pool executor
         executor = concurrent.futures.ThreadPoolExecutor()
@@ -255,13 +231,7 @@ class ImageController:
 
         logging.info("update display publised from detect edges")
         pub.sendMessage("update display")
-
-    async def detect_edges(self, filter):
-        # Keep this as a thin wrapper if needed for backwards compatibility
-        return await asyncio.get_event_loop().run_in_executor(None, self.detect_edges_sync, filter)
-
-
-
+        
 
     @staticmethod
     def convert_to_displayable(edge_img):
