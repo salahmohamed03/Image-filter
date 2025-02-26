@@ -106,6 +106,7 @@ class MainWindowUI(QMainWindow):
 
     def upload_image1(self):
         image = self.upload_image()
+        if image is None: return
         self.images.image1 = image
         size = (250,400)
         if(not self.ui.mixerModeGroup.isChecked()):
@@ -116,6 +117,7 @@ class MainWindowUI(QMainWindow):
     
     def upload_image2(self):
         image = self.upload_image()
+        if image is None: return
         self.images.image2 = image
         piximage = QPixmap.fromImage(image.qimg.scaled(250,400))
         self.ui.OriginalImage2Label.setPixmap(piximage)
@@ -164,14 +166,14 @@ class MainWindowUI(QMainWindow):
             self.ui.OriginalImage1Text.setText("Original")
             if self.ui.normalizationRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Normalized")
-                sefl.ui.OutputImage2Text.setText("Equalized")
+                self.ui.OutputImage2Text.setText("Equalized")
             elif self.ui.histogramRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Histogram")
                 self.ui.OutputImage2Text.setText("CDF")
             elif self.ui.thresholdingRadioButton.isChecked():
                 self.ui.OutputImage1Text.setText("Local")
                 self.ui.OutputImage2Text.setText("Global")
-
+            size = (250,400)
         else:
             self.hide_Widget(self.ui.Out2Widget)
             self.hide_Widget(self.ui.Out3Widget)
