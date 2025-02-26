@@ -1,3 +1,4 @@
+from io import BytesIO
 from pubsub import pub
 import asyncio
 import cv2
@@ -7,6 +8,11 @@ from PyQt6.QtGui import QImage
 import logging
 from copy import copy
 import concurrent.futures
+import matplotlib.pyplot as plt
+import io
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+
+
 logging.basicConfig(
     filename="app.log",
     level=logging.INFO,
@@ -20,30 +26,70 @@ class ImageController:
 
     def bind_events(self):
         # This is all the events that this class is listening to
-        pub.subscribe(self.handle_histogram_equalization, "histogram equalization")
-        pub.subscribe(self.handle_distribution_curve, "distribution curve")
+        
+        pub.subscribe(self.handle_distribution_curve, "Histogram Equalization")
         pub.subscribe(self.handel_detect_edges,"Edge Detection")
 
     
-    def handle_distribution_curve(self, image):
-        async def draw_distribution(image):
-            images = Images()
-            # It's an RGB Image so we need to apply the formula to each channel separately and then combine them
-            colors=["red", "green", "blue"]
-            # red_histo = []
-            # green_histo = []
-            # blue_histo = []
-            for i in range(1):
-                hist = cv2.calcHist([image], [i], None, [256], [0, 256])
-                images.output1 = self.convert_to_displayable(hist)
+    def handle_distribution_curve(self):
+        # Access the image data
+        images= Images()
+        image_data = images.image1.image_data 
 
-            pub.sendMessage("update display")
-            await asyncio.sleep(3)
+        print("start drawing....")
+        
+        # red_histo = []
+        # green_histo = []
+        # blue_histo = []
 
-            pub.sendMessage("distribution curve drawn", result=f"this is distribution curve of ({image})")
+        fig = plt.figure(figsize=(10, 6))
+        plt.title("RGB Color Histogram")
+        plt.xlabel("Pixel Intensity")
+        plt.ylabel("Frequency")
+        
+        # Define colors for plotting
+        colors = ('b', 'g', 'r')
+        channel_names = ('Blue', 'Green', 'Red')
+        
+        # Plot histogram for each color channel
+        for i, color in enumerate(colors):
+            # Calculate histogram for the specific channel
+            histogram = cv2.calcHist([image_data], [i], None, [256], [0, 256])
             
+            # Normalize histogram for better visualization
+            histogram = histogram / histogram.max()
+            
+            # Plot the histogram with proper label
+            plt.plot(histogram, color=color, label=channel_names[i])
+        
+        # Add a legend to distinguish channels
+        plt.legend()
+        
+        # Set the x-axis limits
+        plt.xlim([0, 256])
+        
+        # Show grid for better readability
+        plt.grid(alpha=0.3)
+        
+        # Show the plot
+        plt.tight_layout()
+        plt.show()
 
 
+        # Convert it into image         # Convert Matplotlib plot to QImage
+        # buf = BytesIO()
+        # plt.savefig(buf, format="png", bbox_inches='tight')
+        # plt.close()
+        # buf.seek(0)
+
+        # qimage = QImage.fromData(buf.getvalue())
+
+
+        #images.output1 = self.convert_to_displayable(hist)
+
+
+        pub.sendMessage("update display")
+            
 
     def handle_image_normalizarion(self, image):   
         pass
@@ -52,13 +98,6 @@ class ImageController:
         pass
 
 
-    def handle_distribution_curve(self, image):
-        async def draw_distribution(image):
-
-            await asyncio.sleep(3)
-
-            pub.sendMessage("distribution curve drawn", result=f"this is distribution curve of ({image})")
-            print(f"distribution curve drawn for {image}")
 
 
     def handle_upload_image(self, image_path):
