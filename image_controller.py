@@ -50,9 +50,11 @@ class ImageController:
             color_channels = ("Blue", "Green", "Red")
 
             for i, (color, channel_name) in enumerate(zip(colors, color_channels)):
-                histogram = cv2.calcHist([image_data], [i], None, [256], [0, 256]).flatten()
-                cdf = histogram.cumsum()
-                cdf = cdf / cdf.max() * histogram.max()  # Normalize CDF for better visualization
+                histogram = self.calculate_histogram(image_data[:, :, i])
+                cdf = np.cumsum(histogram)
+                cdf_min = cdf.min()
+                cdf_max = cdf.max()
+                cdf = ((cdf - cdf_min) / (cdf_max - cdf_min) * 255).astype(np.uint8)
                 
                 for ax in axes[i]:
                     ax.set_facecolor("black")
@@ -97,12 +99,12 @@ class ImageController:
         image_data = images.image1.image_data
         image_data =cv2.cvtColor(image_data, cv2.COLOR_BGR2GRAY)
         
-        histogram = cv2.calcHist([image_data], [0], None, [256], [0, 256]).flatten()
-        cdf = histogram.cumsum()
+        histogram = self.calculate_histogram(image_data)
+        cdf = np.cumsum(histogram)
         cdf_min = cdf.min()
         cdf_max = cdf.max()
-        normalized_cdf = (cdf - cdf_min) / (cdf_max - cdf_min) * 255
-
+        normalized_cdf = ((cdf - cdf_min) / (cdf_max - cdf_min) * 255).astype(np.uint8)
+        
 
         equalized_image = normalized_cdf[image_data]
         equalized_image = cv2.cvtColor(equalized_image, cv2.COLOR_GRAY2BGR)
@@ -112,9 +114,7 @@ class ImageController:
 
     def calculate_histogram(self, image_data):
         histogram = np.zeros(256, dtype=np.int32)
-        for row in range(image_data.shape[0]):
-            for col in range(image_data.shape[1]):
-                pixel = image_data[row, col]
+        for pixel in image_data.flatten():
                 histogram[pixel] += 1
         return histogram
     
