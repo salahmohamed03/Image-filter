@@ -19,7 +19,7 @@
   <widget class="QWidget" name="mainCentralWidget">
    <property name="styleSheet">
     <string notr="true">#controlPanelGroup{
-background-color:#002333;
+background-color:#0b192c;
 display:flex;
 flex-direction:column;
 }
@@ -35,7 +35,7 @@ flex-direction:column;
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color:#DEEFE7;
+       <string notr="true">background-color:#0b192c;
 </string>
       </property>
       <layout class="QVBoxLayout" name="mainVerticalLayout">
@@ -129,9 +129,9 @@ flex-direction:column;
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">color:#002333;
-font-size:20px;
-</string>
+                <string notr="true">color:white;
+                font-size:20px;
+                </string>
                </property>
                <property name="text">
                 <string>Image 1</string>
@@ -144,12 +144,13 @@ font-size:20px;
              <item>
               <widget class="QLabel" name="OriginalImage1Label">
                <property name="styleSheet">
-                <string notr="true">background-color: white;
-border-radius: 30px;
-border: 3px solid #002333;
-margin: 10px;  
-padding: 15px; 
-</string>
+                <string notr="true">
+                    background-color: transparent;
+                    border-radius: 30px;
+                    border: 3px solid white;
+                    margin: 10px;  
+                    padding: 15px; 
+                </string>
                </property>
                <property name="text">
                 <string/>
@@ -192,12 +193,13 @@ font-size:20px;
              <item>
               <widget class="QLabel" name="OriginalImage2Label">
                <property name="styleSheet">
-                <string notr="true">background-color: white;
-border-radius: 30px;
-border: 3px solid #002333;
-margin: 10px;  
-padding: 15px; 
-</string>
+                <string notr="true">
+                    background-color: transparent;
+                    border-radius: 30px;
+                    border: 3px solid white;
+                    margin: 10px;  
+                    padding: 15px; 
+                </string>
                </property>
                <property name="text">
                 <string/>
@@ -225,9 +227,9 @@ padding: 15px;
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">color:#002333;
-font-size:20px;
-</string>
+                <string notr="true">color:white;
+                font-size:20px;
+                </string>
                </property>
                <property name="text">
                 <string>Output 1</string>
@@ -240,12 +242,13 @@ font-size:20px;
              <item>
               <widget class="QLabel" name="OutputImage1Label">
                <property name="styleSheet">
-                <string notr="true">background-color: white;
-border-radius: 30px;
-border: 3px solid #002333;
-margin: 10px;  
-padding: 15px; 
-</string>
+                <string notr="true">
+                    background-color: transparent;
+                    border-radius: 30px;
+                    border: 3px solid white;
+                    margin: 10px;  
+                    padding: 15px; 
+                </string>
                </property>
                <property name="text">
                 <string/>
@@ -273,9 +276,9 @@ padding: 15px;
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">color:#002333;
-font-size:20px;
-</string>
+                <string notr="true">color:white;
+                font-size:20px;
+                </string>
                </property>
                <property name="text">
                 <string>Output 2</string>
@@ -288,12 +291,13 @@ font-size:20px;
              <item>
               <widget class="QLabel" name="OutputImage2Label">
                <property name="styleSheet">
-                <string notr="true">background-color: white;
-border-radius: 30px;
-border: 3px solid #002333;
-margin: 10px;  
-padding: 15px; 
-</string>
+                <string notr="true">
+                    background-color: transparent;
+                    border-radius: 30px;
+                    border: 3px solid white;
+                    margin: 10px;  
+                    padding: 15px; 
+                </string>
                </property>
                <property name="text">
                 <string/>
@@ -336,12 +340,13 @@ font-size:20px;
              <item>
               <widget class="QLabel" name="OutputImage3Label">
                <property name="styleSheet">
-                <string notr="true">background-color: white;
-border-radius: 30px;
-border: 3px solid #002333;
-margin: 10px;  
-padding: 15px; 
-</string>
+                <string notr="true">
+                    background-color: transparent;
+                    border-radius: 30px;
+                    border: 3px solid white;
+                    margin: 10px;  
+                    padding: 15px; 
+                </string>
                </property>
                <property name="text">
                 <string/>
@@ -400,12 +405,13 @@ QWidget QPushButton:pressed {
     background-color: #004455;
 }
 ;
-background-color: #002333;
+background-color: #224779;
 border-radius: 10px;
 font-size: 16px;
 font-weight: bold;
 text-align: center;
 color:#DEEFE7;
+border:1px solid white;
 </string>
             </property>
             <property name="text">
@@ -437,12 +443,13 @@ QWidget QPushButton:pressed {
     background-color: #004455;
 }
 ;
-background-color: #002333;
+background-color: #224779;
 border-radius: 10px;
 font-size: 16px;
 font-weight: bold;
 text-align: center;
 color:#DEEFE7;
+border:1px solid white;
 </string>
             </property>
             <property name="text">
@@ -474,12 +481,13 @@ QWidget QPushButton:pressed {
     background-color: #004455;
 }
 ;
-background-color: #002333;
+background-color: #224779;
 border-radius: 10px;
 font-size: 16px;
 font-weight: bold;
 text-align: center;
 color:#DEEFE7;
+border:1px solid white;
 </string>
             </property>
             <property name="text">
@@ -545,7 +553,9 @@ font-weight:bold;
           <string notr="true">color: rgb(255, 255, 255);
 border: 1px solid white;
 border-radius:10px;
-font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
+font: 75 13pt &quot;MS Shell Dlg 2&quot;;
+font-weight:bold;
+</string>
          </property>
          <property name="title">
           <string>Mixer Mode</string>
@@ -574,8 +584,22 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 0);
-font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
+               <string notr="true">
+                QWidget QPushButton:hover {
+                    background-color: #113444;
+                };
+
+                QWidget QPushButton:pressed {
+                    background-color: #004455;
+                }
+                ;
+                background-color: #224779;
+                border-radius: 10px;
+                font-size: 16px;
+                text-align: center;
+                color:#DEEFE7;
+                border:1px solid white;
+                </string>
               </property>
               <property name="text">
                <string>Mix With</string>
@@ -589,8 +613,10 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
             <item>
              <widget class="QLabel" name="label_31">
               <property name="styleSheet">
-               <string notr="true">border:none;
-font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
+               <string notr="true">
+                border:none;
+                font-weight:bold
+               </string>
               </property>
               <property name="text">
                <string>Cuttoff Frequency</string>
@@ -600,7 +626,7 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
             <item>
              <widget class="QSlider" name="cutoffFreqOneSlider">
               <property name="styleSheet">
-               <string notr="true">border:none;</string>
+               <string notr="true">border:none;font-weight:bold</string>
               </property>
               <property name="maximum">
                <number>100</number>
@@ -621,6 +647,7 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
           <string notr="true">color: rgb(255, 255, 255);
 border: 1px solid white;
 border-radius:10px;
+font-weight:bold;
 font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
          </property>
          <property name="title">
@@ -644,8 +671,10 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
             <item>
              <widget class="QLabel" name="label">
               <property name="styleSheet">
-               <string notr="true">border:none;
-font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
+               <string notr="true">
+                    border:none;
+                    font-weight:bold;
+                </string>
               </property>
               <property name="text">
                <string>Add Noise</string>
@@ -661,9 +690,15 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">text-align:center;
-color: rgb(0, 0, 0);
-font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
+               <string notr="true">
+                    text-align:center;
+                    color: white;
+                    font-weight: bold;
+                    padding-left:10px;
+                    background-color: #0b192c;
+                    font: 11pt &quot;MS Shell Dlg 2&quot;;
+                    font-size: 18px;
+                </string>
               </property>
               <property name="editable">
                <bool>false</bool>
@@ -698,13 +733,13 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
           <item>
            <widget class="QWidget" name="saltPepperWidget" native="true">
             <property name="styleSheet">
-             <string notr="true">border:none;</string>
+             <string notr="true">border:none;font-weight:bold</string>
             </property>
             <layout class="QHBoxLayout" name="saltPepperLayout">
              <item>
               <widget class="QLabel" name="label_27">
                <property name="styleSheet">
-                <string notr="true">border:none;</string>
+                <string notr="true">border:none;font-weight:bold</string>
                </property>
                <property name="text">
                 <string>salt</string>
@@ -714,7 +749,7 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
              <item>
               <widget class="QSlider" name="saltNoiseSlider">
                <property name="styleSheet">
-                <string notr="true">border:none;</string>
+                <string notr="true">border:none;font-weight:bold</string>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -724,7 +759,7 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
              <item>
               <widget class="QLabel" name="label_28">
                <property name="styleSheet">
-                <string notr="true">border:none;</string>
+                <string notr="true">border:none;font-weight:bold</string>
                </property>
                <property name="text">
                 <string>pepper</string>
@@ -734,7 +769,7 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
              <item>
               <widget class="QSlider" name="pepperNoiseSlider">
                <property name="styleSheet">
-                <string notr="true">border:none;</string>
+                <string notr="true">border:none;font-weight:bold;</string>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -749,7 +784,7 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
             <item>
              <widget class="QLabel" name="label_2">
               <property name="styleSheet">
-               <string notr="true">border:none;</string>
+               <string notr="true">border:none;font-weight:bold;</string>
               </property>
               <property name="text">
                <string>Add Filter</string>
@@ -765,7 +800,14 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 0);</string>
+               <string notr="true">
+                    text-align:center;
+                    color: white;
+                    padding-left:10px;
+                    background-color: #0b192c;
+                    font: 11pt &quot;MS Shell Dlg 2&quot;;
+                    font-size: 18px;
+                </string>
               </property>
               <property name="currentText">
                <string>None</string>
@@ -806,10 +848,17 @@ font: 11pt &quot;MS Shell Dlg 2&quot;;</string>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">color: rgb(255, 255, 255);
-border: 1px solid white;
-border-radius:10px;
-font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
+          <string notr="true">                    
+                text-align:center;
+                color: white;
+                font-weight: bold;
+                padding-left:10px;
+                border:1px solid white;
+                background-color: #0b192c;
+                font: 11pt &quot;MS Shell Dlg 2&quot;;
+                font-size: 18px;
+                color:white;
+            </string>
          </property>
          <property name="title">
           <string>Edge Detection</string>
@@ -842,7 +891,7 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true">color: rgb(0, 0, 0);</string>
+             <string notr="true">color:white;font-weight:bold</string>
             </property>
             <item>
              <property name="text">
@@ -940,11 +989,13 @@ font-weight:bold;</string>
             <item>
              <widget class="QRadioButton" name="freqDomainRadioButton">
               <property name="styleSheet">
-               <string notr="true">border:none;
-text-align:center;
-font-size:20px;
-color:#DEEFE7;
-font-weight:bold;</string>
+                <string notr="true">border:none;
+                    text-align:center;
+                    font-size:20px;
+                    color:#DEEFE7;
+                    font-weight:bold;
+                    margin-bottom:30px;
+                </string>
               </property>
               <property name="text">
                <string>Freq. Domain Filters</string>
@@ -956,18 +1007,27 @@ font-weight:bold;</string>
               <item>
                <widget class="QLabel" name="label_30">
                 <property name="styleSheet">
-                 <string notr="true">border:none;
-font-size:15px;</string>
+                 <string notr="true">
+                    border:none;
+                    font-size:20px;
+                </string>
                 </property>
                 <property name="text">
-                 <string>Cuttoff Frequency </string>
+                 <string>Cuttoff Frequency</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QSlider" name="cutoffFrequencySlider">
+               <size>
+                    <width>0</width>
+                    <height>50</height>
+                </size>
                 <property name="styleSheet">
-                 <string notr="true">border:none;</string>
+                <string notr="true">
+                    border:none;
+                    font-weight:bold;
+                </string>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
