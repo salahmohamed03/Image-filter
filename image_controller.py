@@ -44,7 +44,7 @@ class ImageController:
                 return
                 
             fig, axes = plt.subplots(3, 2, figsize=(12, 10))
-            fig.patch.set_facecolor('black')
+            fig.patch.set_facecolor('#0b192c')
 
             colors = ("b", "g", "r")
             color_channels = ("Blue", "Green", "Red")
@@ -57,7 +57,7 @@ class ImageController:
                 cdf = ((cdf - cdf_min) / (cdf_max - cdf_min) * 255).astype(np.uint8)
                 
                 for ax in axes[i]:
-                    ax.set_facecolor("black")
+                    ax.set_facecolor("#0b192c")
                     ax.tick_params(axis='x', colors="white")
                     ax.tick_params(axis='y', colors="white")
                     ax.spines["bottom"].set_color("white")
