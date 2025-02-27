@@ -948,10 +948,12 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
              <widget class="QRadioButton" name="normalizationRadioButton">
               <property name="styleSheet">
                <string notr="true">border:none;
-text-align:center;
-font-size:20px;
-color:#DEEFE7;
-font-weight:bold;</string>
+                text-align:center;
+                font-size:15px;
+                color:#DEEFE7;
+                font-weight:bold;
+                margin-top: 30px;
+                </string>
               </property>
               <property name="text">
                <string>Normalization and Equalizer</string>
@@ -962,10 +964,11 @@ font-weight:bold;</string>
              <widget class="QRadioButton" name="thresholdingRadioButton">
               <property name="styleSheet">
                <string notr="true">border:none;
-text-align:center;
-font-size:20px;
-color:#DEEFE7;
-font-weight:bold;</string>
+                text-align:center;
+                font-size:15px;
+                color:#DEEFE7;
+                font-weight:bold;
+                </string>
               </property>
               <property name="text">
                <string>Local and Global Thresholding</string>
@@ -976,10 +979,11 @@ font-weight:bold;</string>
              <widget class="QRadioButton" name="histogramRadioButton">
               <property name="styleSheet">
                <string notr="true">border:none;
-text-align:center;
-font-size:20px;
-color:#DEEFE7;
-font-weight:bold;</string>
+                text-align:center;
+                font-size:15px;
+                color:#DEEFE7;
+                font-weight:bold;
+                </string>
               </property>
               <property name="text">
                <string>Histogram and CDF</string>
@@ -991,7 +995,7 @@ font-weight:bold;</string>
               <property name="styleSheet">
                 <string notr="true">border:none;
                     text-align:center;
-                    font-size:20px;
+                    font-size:15px;
                     color:#DEEFE7;
                     font-weight:bold;
                     margin-bottom:30px;
