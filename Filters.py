@@ -1,4 +1,3 @@
-
 from pubsub import pub
 from PyQt6.QtWidgets import QApplication, QLabel, QMainWindow
 from PyQt6.QtGui import QPixmap
@@ -174,38 +173,78 @@ def get_effective_array(qimage):
 
 
 
+def create_gaussian_kernel_freq(shape, sigma):
+    """Creates a Gaussian kernel in frequency domain"""
+    rows, cols = shape
+    center_row, center_col = rows // 2, cols // 2
+    
+    y = np.fft.fftfreq(rows)[:, None]
+    x = np.fft.fftfreq(cols)
+    
+    # Create meshgrid of frequencies
+    y, x = np.meshgrid(y, x, indexing='ij')
+    # Calculate squared distance from center
+    d_squared = x**2 + y**2
+    
+    # Create Gaussian in frequency domain
+    return np.exp(-2 * (np.pi**2) * sigma**2 * d_squared)
+
 def apply_gaussian_filter(qimage, sigma=2.0):
-    #higher sigma for higher blur 
     arr, new_row_bytes, channels = get_effective_array(qimage)
     height, width = arr.shape[:2]
-
-    # Create an output array of the same shape
+    
+    # Create Gaussian kernel in frequency domain
+    kernel_freq = create_gaussian_kernel_freq((height, width), sigma)
     out = np.empty_like(arr)
-
-    # Apply Gaussian filter per channel
+    
+    # Process each channel in frequency domain
     for c in range(channels):
-        out[:, :, c] = ndimage.gaussian_filter(arr[:, :, c], sigma=sigma, mode='nearest')
-
-    # Clip to [0, 255] in case of floating rounding
+        # Convert image to frequency domain
+        img_freq = np.fft.fft2(arr[:,:,c])
+        # Apply filter (multiplication in frequency domain = convolution in spatial domain)
+        filtered_freq = img_freq * kernel_freq
+        # Convert back to spatial domain
+        out[:,:,c] = np.real(np.fft.ifft2(filtered_freq))
+    
     out = np.clip(out, 0, 255).astype(np.uint8)
-
-    # Reconstruct the QImage with the effective row width
     new_image = QImage(out.data, width, height, new_row_bytes, qimage.format())
     return new_image
 
+def create_average_kernel_freq(shape, size):
+    """Creates an average filter kernel in frequency domain"""
+    rows, cols = shape
+    spatial_kernel = np.ones((size, size)) / (size * size)
+    
+    # Pad kernel to image size
+    padded_kernel = np.zeros((rows, cols))
+    start_row = (rows - size) // 2
+    start_col = (cols - size) // 2
+    padded_kernel[start_row:start_row+size, start_col:start_col+size] = spatial_kernel
+    
+    # Convert to frequency domain
+    return np.fft.fft2(np.fft.ifftshift(padded_kernel))
 
 def apply_average_filter(qimage, size=7):
-    """
-    Applies a simple average (mean) filter of a given size (default 3x3).
-    """
     arr, new_row_bytes, channels = get_effective_array(qimage)
     height, width = arr.shape[:2]
-
+    
+    # Ensure size is odd
+    if size % 2 == 0:
+        size += 1
+    
+    # Create average filter kernel in frequency domain
+    kernel_freq = create_average_kernel_freq((height, width), size)
     out = np.empty_like(arr)
+    
+    # Process each channel in frequency domain
     for c in range(channels):
-        # Uniform filter is basically an average filter
-        out[:, :, c] = ndimage.uniform_filter(arr[:, :, c], size=size, mode='nearest')
-
+        # Convert image to frequency domain
+        img_freq = np.fft.fft2(arr[:,:,c])
+        # Apply filter
+        filtered_freq = img_freq * kernel_freq
+        # Convert back to spatial domain
+        out[:,:,c] = np.real(np.fft.ifft2(filtered_freq))
+    
     out = np.clip(out, 0, 255).astype(np.uint8)
     new_image = QImage(out.data, width, height, new_row_bytes, qimage.format())
     return new_image
@@ -213,14 +252,36 @@ def apply_average_filter(qimage, size=7):
 
 def apply_median_filter(qimage, size=7):
     """
-    Applies a median filter with the given window size (default 3x3).
+    Applies a median filter with the given window size (default 7x7) using Fourier transform.
     """
     arr, new_row_bytes, channels = get_effective_array(qimage)
     height, width = arr.shape[:2]
 
+    # Ensure size is odd
+    if size % 2 == 0:
+        size += 1
+
+    # Create median filter kernel in spatial domain
+    spatial_kernel = np.ones((size, size)) / (size * size)
+
+    # Pad kernel to image size
+    padded_kernel = np.zeros((height, width))
+    start_row = (height - size) // 2
+    start_col = (width - size) // 2
+    padded_kernel[start_row:start_row+size, start_col:start_col+size] = spatial_kernel
+
+    # Convert kernel to frequency domain
+    kernel_freq = np.fft.fft2(np.fft.ifftshift(padded_kernel))
     out = np.empty_like(arr)
+
+    # Process each channel in frequency domain
     for c in range(channels):
-        out[:, :, c] = ndimage.median_filter(arr[:, :, c], size=size, mode='nearest')
+        # Convert image to frequency domain
+        img_freq = np.fft.fft2(arr[:, :, c])
+        # Apply filter
+        filtered_freq = img_freq * kernel_freq
+        # Convert back to spatial domain
+        out[:, :, c] = np.real(np.fft.ifft2(filtered_freq))
 
     out = np.clip(out, 0, 255).astype(np.uint8)
     new_image = QImage(out.data, width, height, new_row_bytes, qimage.format())
