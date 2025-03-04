@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 import io
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
-
 logging.basicConfig(
     filename="app.log",
     level=logging.INFO,
@@ -25,7 +24,6 @@ class ImageController:
         self.bind_events()
 
     def bind_events(self):
-        # This is all the events that this class is listening to
         pub.subscribe(self.handle_equalization, "Normalize Image")
         pub.subscribe(self.handle_distribution_curve, "Histogram Equalization")
         pub.subscribe(self.handle_detect_edges,"Edge Detection")
@@ -35,7 +33,6 @@ class ImageController:
     
     def handle_distribution_curve(self):
         try:
-            # Access the image data
             images = Images()
             image_data = images.image1.image_data 
                         
@@ -162,7 +159,7 @@ class ImageController:
         logging.info("Update display published from thresholding")
         pub.sendMessage("update display")
 
-
+    
     def handle_detect_edges(self, filter):
         pub.sendMessage("start Loading")
         # Create a thread pool executor
@@ -171,110 +168,123 @@ class ImageController:
         # Run the CPU-intensive task in a separate thread
         loop.run_in_executor(executor, self.detect_edges_sync, filter)
 
-    def detect_edges_sync(self, filter):
-        # Move the content of detect_edges here, without async
-        # Remove the async/await keywords
-        images = Images()        
-        
-        # We need to use fft to detect edges
-        image = copy(images.image1.image_data)
-        copyImage = copy(image)
-        copyImage = cv2.cvtColor(copyImage, cv2.COLOR_BGR2GRAY)
-        
-        # Convert image to float32 for better precision
-        copyImage = copyImage.astype(np.float32)
-        
-        # Initialize output arrays
-        rows, cols = copyImage.shape
-        x_edge_image = np.zeros_like(copyImage, dtype=np.float32)
-        y_edge_image = np.zeros_like(copyImage, dtype=np.float32)
-        filtered_image = np.zeros_like(copyImage, dtype=np.float32)
 
-        # Define kernels
-        if filter == "Sobel":
-            Kx = np.array([[-1, 0, 1], 
-                           [-2, 0, 2], 
-                           [-1, 0, 1]])
-            Ky = np.array([[1, 2, 1], 
-                           [0, 0, 0], 
-                           [-1, -2, -1]])
+    def fourier_transform(self, image):
+        print("FOURIER TRANSFORM STARTED")
 
-        elif filter == "Prewitt":
-            Kx = np.array([[-1, 0, 1], 
-                           [-1, 0, 1], 
-                           [-1, 0, 1]])
-            Ky = np.array([[1, 1, 1], 
-                           [0, 0, 0], 
-                           [-1, -1, -1]])
-            
-        elif filter == "Roberts":
-            Kx = np.array([[1, 0], 
-                           [0, -1]])
-            Ky = np.array([[0, 1], 
-                           [-1, 0]])
-        else:
-            filtered_image = cv2.Canny(image, 0, 200)
-    
+        if image is None or image.size == 0:
+            print("ERROR: Image is empty or None")
+            return None
+
+        if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        image = image.astype(np.float32)
+
+        try:
+            ft_components = np.fft.fft2(image)
+            ft_components = np.fft.fftshift(ft_components) 
+            ft_magnitude = np.log(np.abs(ft_components) + 1)  
+            ft_phase = np.angle(ft_components)
+
             results = {
-                "x_edges" : np.zeros_like(copyImage),
-                "y_edges" : np.zeros_like(copyImage),
+                "ft_magnitude": ft_magnitude,
+                "ft_phase": ft_phase,
+                "ft_components": ft_components  
+            }
+
+            print("FOURIER TRANSFORM COMPLETE")
+            return results
+        
+        except Exception as e:
+            print(f"ERROR in FFT2: {e}")
+            return None
+
+
+    def detect_edges_sync(self, filter):
+        images = Images()
+        image = copy(images.image1.image_data)
+        copyImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY).astype(np.float32)
+        rows, cols = copyImage.shape
+        print(f"Image shape: {rows}x{cols}")
+
+        ft_data = self.fourier_transform(copyImage)
+        if ft_data is None:
+            print("Error: Fourier transform failed.")
+            return
+        
+        ft_components = ft_data["ft_components"] 
+
+        if filter == "Sobel":
+            Kx = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+            Ky = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
+        elif filter == "Prewitt":
+            Kx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
+            Ky = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
+        elif filter == "Roberts":
+            Kx = np.array([[1, 0], [0, -1]])
+            Ky = np.array([[0, 1], [-1, 0]])
+        else:
+            print("Applying Canny filter instead")
+            filtered_image = cv2.Canny(copyImage.astype(np.uint8), 100, 200)
+            results = {
+                "x_edges": np.zeros_like(copyImage),
+                "y_edges": np.zeros_like(copyImage),
                 "filtered_image": filtered_image
-            } 
+            }
             images.output1 = self.convert_to_displayable(results["x_edges"])
             images.output2 = self.convert_to_displayable(results["y_edges"])
             images.output3 = self.convert_to_displayable(results["filtered_image"])
-            logging.info("update display publised from detect edges")
             pub.sendMessage("update display")
             return 
+
+        Kx_padded = np.zeros_like(copyImage)
+        Ky_padded = np.zeros_like(copyImage)
         
+        kh, kw = Kx.shape
+        Kx_padded[:kh, :kw] = Kx
+        Ky_padded[:kh, :kw] = Ky
 
-        # Optimized loop with numpy operations
-        for i in range(1, rows - 1):
-            for j in range(1, cols - 1):
-                # Extract 3x3 neighborhood
-                if filter == "Roberts":
-                    neighborhood = copyImage[i-1:i+1, j-1:j+1]
-                else:
-                    neighborhood = copyImage[i-1:i+2, j-1:j+2]
-                
-                # Calculate gradients using element-wise multiplication and sum
-                Gx = np.sum(neighborhood * Kx)
-                Gy = np.sum(neighborhood * Ky)
-                
-                # Store results
-                x_edge_image[i, j] = Gx
-                y_edge_image[i, j] = Gy
-                filtered_image[i, j] = np.sqrt(Gx*Gx + Gy*Gy)
+        Kx_fft = np.fft.fft2(Kx_padded)
+        Ky_fft = np.fft.fft2(Ky_padded)
 
-        # # Normalize the results to 0-255 range
-        x_edge_image = cv2.normalize(x_edge_image, None, 0, 255, cv2.NORM_MINMAX)
-        y_edge_image = cv2.normalize(y_edge_image, None, 0, 255, cv2.NORM_MINMAX)
-        filtered_image = cv2.normalize(filtered_image, None, 0, 255, cv2.NORM_MINMAX)
+        print("Kernel FFT computed")
 
-        # Convert back to uint8
+        Gx_fft = ft_components * Kx_fft
+        Gy_fft = ft_components * Ky_fft
+
+        x_edge_image = np.fft.ifft2(Gx_fft).real
+        y_edge_image = np.fft.ifft2(Gy_fft).real
+        filtered_image = np.sqrt(x_edge_image**2 + y_edge_image**2)
+
+        x_edge_image = (x_edge_image - np.min(x_edge_image)) / (np.max(x_edge_image) - np.min(x_edge_image)) * 255
+        filtered_image = (filtered_image - np.min(filtered_image)) / (np.max(filtered_image) - np.min(filtered_image)) * 255
+        
         x_edge_image = x_edge_image.astype(np.uint8)
-        y_edge_image = y_edge_image.astype(np.uint8)
         filtered_image = filtered_image.astype(np.uint8)
-        
-        # Convert original image back to BGR for display
-        copyImage = cv2.cvtColor(copyImage.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-        filtered_image = cv2.cvtColor(filtered_image.astype(np.uint8), cv2.COLOR_GRAY2BGR)
 
-        images.output1 = self.convert_to_displayable(x_edge_image)
-        images.output2 = self.convert_to_displayable(y_edge_image) 
-        images.output3 = self.convert_to_displayable(filtered_image)
+        print("Filtering complete")
 
-        logging.info("update display publised from detect edges")
+        results = {
+            "x_edges": x_edge_image,
+            "y_edges": y_edge_image,
+            "filtered_image": filtered_image
+        }
+        images.output1 = self.convert_to_displayable(results["x_edges"])
+        images.output2 = self.convert_to_displayable(results["y_edges"])
+        images.output3 = self.convert_to_displayable(results["filtered_image"])
+
         pub.sendMessage("update display")
+        print("Edge detection complete, results published")
+
+
 
 
     @staticmethod
     def convert_to_displayable(edge_img):
-        # Ensure the image is uint8
         if edge_img.dtype != np.uint8:
             edge_img = cv2.normalize(edge_img, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
         
-        # If image is grayscale, convert to 3-channel
         if len(edge_img.shape) == 2:
             edge_img = cv2.cvtColor(edge_img, cv2.COLOR_GRAY2RGB)
 
@@ -287,17 +297,14 @@ class ImageController:
     
     @staticmethod
     def convert_to_displayable_simpel(edge_img):
-        # Convert to uint8 if needed and ensure RGB format
         if edge_img.dtype != np.uint8:
             edge_img = cv2.normalize(edge_img, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
         if len(edge_img.shape) == 2:
             edge_img = cv2.cvtColor(edge_img, cv2.COLOR_GRAY2RGB)
             
-        # Create QImage directly from the RGB array
         height, width = edge_img.shape[:2]
         qimage = QImage(edge_img.data, width, height, width * 3, QImage.Format.Format_RGB888)
         
-        # Convert to final image format
         image_data = np.frombuffer(qimage.bits(), dtype=np.uint8).reshape(height, width, 3)
         return Image(image_data=image_data)
 
