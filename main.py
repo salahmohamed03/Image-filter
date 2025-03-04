@@ -1,8 +1,6 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-
 from MainWindowUI import MainWindowUI
-from fourier import Fourier
 import asyncio
 from qasync import QEventLoop
 import Filters
@@ -11,7 +9,6 @@ from imageFT import ImageFT
 
 async def main():
     # Initialize classes
-    fourier = Fourier()
     Filters.bind_events()
     image_controller = ImageController()
     imageft = ImageFT()

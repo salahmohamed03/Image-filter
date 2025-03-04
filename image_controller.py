@@ -16,7 +16,6 @@ logging.basicConfig(
     filename="app.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
-    filemode="a"  # "w" overwrites the file; use "a" to append
 )
 
 class ImageController:
@@ -41,7 +40,6 @@ class ImageController:
                 return
                 
             fig, axes = plt.subplots(3, 2, figsize=(12, 10))
-            fig.patch.set_facecolor('#0b192c')
 
             colors = ("b", "g", "r")
             color_channels = ("Blue", "Green", "Red")
@@ -54,13 +52,11 @@ class ImageController:
                 cdf = ((cdf - cdf_min) / (cdf_max - cdf_min) * 255).astype(np.uint8)
                 
                 for ax in axes[i]:
-                    ax.set_facecolor("#0b192c")
                     ax.tick_params(axis='x', colors="white")
                     ax.tick_params(axis='y', colors="white")
                     ax.spines["bottom"].set_color("white")
                     ax.spines["left"].set_color("white")
 
-                # Plot and fill histogram
                 axes[i, 0].fill_between(range(256), histogram, color=color, alpha=0.4)
                 axes[i, 0].plot(histogram, color=color, linewidth=1.5)
                 axes[i, 0].set_title(f"{channel_name} Histogram", color="white")
@@ -69,7 +65,6 @@ class ImageController:
                 axes[i, 0].set_xlim([0, 256])
                 axes[i, 0].grid(alpha=0.3, color="gray")
 
-                # Plot and fill CDF
                 axes[i, 1].fill_between(range(256), cdf, color=color, alpha=0.4)
                 axes[i, 1].plot(cdf, color=color, linewidth=1.5)
                 axes[i, 1].set_title(f"{channel_name} CDF", color="white")
@@ -78,7 +73,6 @@ class ImageController:
                 axes[i, 1].set_xlim([0, 256])
                 axes[i, 1].grid(alpha=0.3, color="gray")
 
-            # Adjust layout
             plt.tight_layout()
             fig.subplots_adjust(top=0.92)
 
@@ -131,27 +125,21 @@ class ImageController:
         image_data = copy(image.image_data)
         gray_image = cv2.cvtColor(image_data, cv2.COLOR_BGR2GRAY)
 
-        # Apply Local (Adaptive Mean) Thresholding
         local_thresh = cv2.adaptiveThreshold(
            gray_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2
         )
 
-        # Apply Global (Otsu) Thresholding - Extract only the second item (thresholded image)
         _,global_thresh = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-        # Normalize the results to 0-255 range
         local_thresh = cv2.normalize(local_thresh, None, 0, 255, cv2.NORM_MINMAX)
         global_thresh = cv2.normalize(global_thresh, None, 0, 255, cv2.NORM_MINMAX)
 
-        # Convert back to uint8
         local_thresh = local_thresh.astype(np.uint8)
         global_thresh = global_thresh.astype(np.uint8)
 
-        # Convert grayscale images to BGR for display
         local_thresh = cv2.cvtColor(local_thresh, cv2.COLOR_GRAY2BGR)
         global_thresh = cv2.cvtColor(global_thresh, cv2.COLOR_GRAY2BGR)
 
-        # Convert images to displayable format
         images.output1 = self.convert_to_displayable(local_thresh) 
         images.output2 = self.convert_to_displayable(global_thresh)  
 
@@ -162,10 +150,8 @@ class ImageController:
     
     def handle_detect_edges(self, filter):
         pub.sendMessage("start Loading")
-        # Create a thread pool executor
         executor = concurrent.futures.ThreadPoolExecutor()
         loop = asyncio.get_event_loop()
-        # Run the CPU-intensive task in a separate thread
         loop.run_in_executor(executor, self.detect_edges_sync, filter)
 
 
@@ -175,9 +161,6 @@ class ImageController:
         if image is None or image.size == 0:
             print("ERROR: Image is empty or None")
             return None
-
-        if len(image.shape) == 3:
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         image = image.astype(np.float32)
 
@@ -204,20 +187,23 @@ class ImageController:
     def detect_edges_sync(self, filter):
         images = Images()
         image = copy(images.image1.image_data)
-        copyImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY).astype(np.float32)
-        rows, cols = copyImage.shape
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY).astype(np.float32)
+
+        rows, cols = gray.shape
         print(f"Image shape: {rows}x{cols}")
 
-        ft_data = self.fourier_transform(copyImage)
+        # Compute Fourier Transform
+        ft_data = self.fourier_transform(gray)
         if ft_data is None:
             print("Error: Fourier transform failed.")
             return
         
         ft_components = ft_data["ft_components"] 
 
+        # Choose Edge Detection Filter
         if filter == "Sobel":
-            Kx = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
-            Ky = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
+            Kx = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])  # Sobel X
+            Ky = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])  # Sobel Y
         elif filter == "Prewitt":
             Kx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
             Ky = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
@@ -226,10 +212,19 @@ class ImageController:
             Ky = np.array([[0, 1], [-1, 0]])
         else:
             print("Applying Canny filter instead")
-            filtered_image = cv2.Canny(copyImage.astype(np.uint8), 100, 200)
+
+            # Apply Gaussian Blur to separate horizontal/vertical edges
+            blurred_x = cv2.GaussianBlur(gray, (1, 5), 0)  # Blur in Y direction
+            blurred_y = cv2.GaussianBlur(gray, (5, 1), 0)  # Blur in X direction
+
+            x_edge_image = cv2.Canny(blurred_x.astype(np.uint8), 50, 150)
+            y_edge_image = cv2.Canny(blurred_y.astype(np.uint8), 50, 150)
+            filtered_image = cv2.Canny(gray.astype(np.uint8), 50, 150)
+
+            # Display results
             results = {
-                "x_edges": np.zeros_like(copyImage),
-                "y_edges": np.zeros_like(copyImage),
+                "x_edges": x_edge_image,
+                "y_edges": y_edge_image,
                 "filtered_image": filtered_image
             }
             images.output1 = self.convert_to_displayable(results["x_edges"])
@@ -238,18 +233,23 @@ class ImageController:
             pub.sendMessage("update display")
             return 
 
-        Kx_padded = np.zeros_like(copyImage)
-        Ky_padded = np.zeros_like(copyImage)
-        
+        # Zero-Pad Kernels for Fourier Domain Convolution
+        Kx_padded = np.zeros_like(gray)
+        Ky_padded = np.zeros_like(gray)
+
         kh, kw = Kx.shape
         Kx_padded[:kh, :kw] = Kx
         Ky_padded[:kh, :kw] = Ky
 
+        # Compute FFT of the Kernels
         Kx_fft = np.fft.fft2(Kx_padded)
         Ky_fft = np.fft.fft2(Ky_padded)
 
-        print("Kernel FFT computed")
+        # Shift for Proper Convolution
+        Kx_fft = np.fft.fftshift(Kx_fft)
+        Ky_fft = np.fft.fftshift(Ky_fft)
 
+        # Apply Edge Detection in Fourier Domain
         Gx_fft = ft_components * Kx_fft
         Gy_fft = ft_components * Ky_fft
 
@@ -257,14 +257,15 @@ class ImageController:
         y_edge_image = np.fft.ifft2(Gy_fft).real
         filtered_image = np.sqrt(x_edge_image**2 + y_edge_image**2)
 
-        x_edge_image = (x_edge_image - np.min(x_edge_image)) / (np.max(x_edge_image) - np.min(x_edge_image)) * 255
-        filtered_image = (filtered_image - np.min(filtered_image)) / (np.max(filtered_image) - np.min(filtered_image)) * 255
-        
-        x_edge_image = x_edge_image.astype(np.uint8)
-        filtered_image = filtered_image.astype(np.uint8)
+        # **Normalize Edge Maps to Enhance Visibility**
+        x_edge_image = cv2.normalize(np.abs(x_edge_image), None, 0, 255, cv2.NORM_MINMAX)
+        y_edge_image = cv2.normalize(np.abs(y_edge_image), None, 0, 255, cv2.NORM_MINMAX)
+        filtered_image = cv2.normalize(np.sqrt(x_edge_image**2 + y_edge_image**2), None, 0, 255, cv2.NORM_MINMAX)
+
 
         print("Filtering complete")
 
+        # Store and Display Results
         results = {
             "x_edges": x_edge_image,
             "y_edges": y_edge_image,
@@ -276,6 +277,7 @@ class ImageController:
 
         pub.sendMessage("update display")
         print("Edge detection complete, results published")
+
 
 
 
