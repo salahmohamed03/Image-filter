@@ -129,34 +129,67 @@ class ImageController:
         return normalized_image
 
     def handle_thresholding(self):
-        print("Debugging thresholding")
         images = Images()
         image = copy(images.image1)
         image_data = copy(image.image_data)
+
+        # Convert to grayscale using OpenCV
         gray_image = cv2.cvtColor(image_data, cv2.COLOR_BGR2GRAY)
 
-        local_thresh = cv2.adaptiveThreshold(
-           gray_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2
-        )
+        ### ADAPTIVE THRESHOLDING (LOCAL MEAN METHOD) ###
+        block_size = 11  # The size of the local region to compute the threshold
+        C = 2  # A constant subtracted from the local mean
 
-        _,global_thresh = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        # Compute local mean using OpenCV's mean filter
+        kernel = np.ones((block_size, block_size), np.float32) / (block_size * block_size)
+        local_mean = cv2.filter2D(gray_image, -1, kernel)
 
-        local_thresh = cv2.normalize(local_thresh, None, 0, 255, cv2.NORM_MINMAX)
-        global_thresh = cv2.normalize(global_thresh, None, 0, 255, cv2.NORM_MINMAX)
+        # Apply adaptive thresholding manually
+        local_thresh = gray_image.copy()
+        local_thresh[gray_image > (local_mean - C)] = 255  # Pixels greater than local mean - C → White
+        local_thresh[gray_image <= (local_mean - C)] = 0   # Pixels less than or equal → Black
 
-        local_thresh = local_thresh.astype(np.uint8)
-        global_thresh = global_thresh.astype(np.uint8)
+        ### OTSU'S GLOBAL THRESHOLDING ###
+        best_thresh = 0
+        max_variance = 0
+        total_pixels = gray_image.size
 
-        local_thresh = cv2.cvtColor(local_thresh, cv2.COLOR_GRAY2BGR)
-        global_thresh = cv2.cvtColor(global_thresh, cv2.COLOR_GRAY2BGR)
+        for best_thresh_val in range(256):
+            # Split pixels into two classes based on threshold
+            black_pixels = gray_image[gray_image <= best_thresh_val]
+            white_pixels = gray_image[gray_image > best_thresh_val]
 
-        images.output1 = self.convert_to_displayable(local_thresh) 
-        images.output2 = self.convert_to_displayable(global_thresh)  
+            # Ensure there are pixels in both classes to avoid division errors
+            if black_pixels.size == 0 or white_pixels.size == 0:
+                continue
 
+            # Compute class weights (percentage of total image pixels)
+            black_weight = black_pixels.size / total_pixels
+            white_weight = white_pixels.size / total_pixels
+
+            # Compute means for each class
+            mean_black = np.mean(black_pixels)
+            mean_white = np.mean(white_pixels)
+
+            # Compute inter-class variance (Otsu's method)
+            var = white_weight * black_weight * (mean_black - mean_white) ** 2
+
+            # Track the best threshold (highest variance)
+            if var > max_variance:
+                max_variance = var
+                best_thresh = best_thresh_val
+
+        # Apply global thresholding manually
+        global_thresh = gray_image.copy()
+        global_thresh[gray_image > best_thresh] = 255  # Pixels greater than threshold → White
+        global_thresh[gray_image <= best_thresh] = 0   # Pixels less than or equal to threshold → Black
+
+        # Convert images to displayable format
+        images.output1 = self.convert_to_displayable(local_thresh)
+        images.output2 = self.convert_to_displayable(global_thresh)
 
         logging.info("Update display published from thresholding")
         pub.sendMessage("update display")
-
     
     def handle_detect_edges(self, filter):
         pub.sendMessage("start Loading")
