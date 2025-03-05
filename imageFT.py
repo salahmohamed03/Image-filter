@@ -12,18 +12,12 @@ logging.basicConfig(
     filename="app.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
-    filemode="a"  # "w" overwrites the file; use "a" to append
+    filemode="a" 
 )
 
 class ImageFT:
-    """
-    Class for frequency domain operations on images.
-    Provides methods for low-pass filtering, high-pass filtering,
-    and mixing images using frequency filters without OpenCV.
-    """
     
     def __init__(self):
-        """Initialize the ImageFT class."""
         self._bind_events()
     
     def _bind_events(self):
@@ -33,39 +27,23 @@ class ImageFT:
 
     @staticmethod
     def _resize_to_match(img1, img2):
-        """
-        Resize both images to match the maximum dimensions and add padding.
-        
-        Args:
-            img1 (numpy.ndarray): First image
-            img2 (numpy.ndarray): Second image
-            
-        Returns:
-            tuple: (resized_img1, resized_img2) with padding
-        """
-        # Get maximum dimensions
         max_height = max(img1.shape[0], img2.shape[0])
         max_width = max(img1.shape[1], img2.shape[1])
         
-        # Convert to PIL Images for resizing
-        if len(img1.shape) == 3:  # Color images
+        if len(img1.shape) == 3: 
             pil_img1 = PIL.Image.fromarray(img1.astype(np.uint8))
             pil_img2 = PIL.Image.fromarray(img2.astype(np.uint8))
-            # Create padded arrays
             padded1 = np.zeros((max_height, max_width, img1.shape[2]), dtype=np.uint8)
             padded2 = np.zeros((max_height, max_width, img2.shape[2]), dtype=np.uint8)
-        else:  # Grayscale images
+        else: 
             pil_img1 = PIL.Image.fromarray(img1.astype(np.uint8))
             pil_img2 = PIL.Image.fromarray(img2.astype(np.uint8))
-            # Create padded arrays
             padded1 = np.zeros((max_height, max_width), dtype=np.uint8)
             padded2 = np.zeros((max_height, max_width), dtype=np.uint8)
             
-        # Resize and convert back to numpy arrays
         resized1 = np.array(pil_img1.resize((max_width, max_height)))
         resized2 = np.array(pil_img2.resize((max_width, max_height)))
             
-        # Copy resized images into padded arrays
         padded1[:resized1.shape[0], :resized1.shape[1]] = resized1
         padded2[:resized2.shape[0], :resized2.shape[1]] = resized2
             
@@ -73,53 +51,25 @@ class ImageFT:
     
     @staticmethod
     def _create_frequency_mask(shape, cutoff, filter_type="lpf"):
-        """
-        Create a frequency domain mask for filtering.
-        
-        Args:
-            shape (tuple): Shape of the mask (height, width)
-            cutoff (float): Cutoff frequency (normalized 0-1)
-            filter_type (str): Either "lpf" for low-pass or "hpf" for high-pass
-            
-        Returns:
-            numpy.ndarray: Frequency domain mask
-        """
         rows, cols = shape
         crow, ccol = rows // 2, cols // 2
         
-        # Create meshgrid for distance calculation
         y, x = np.ogrid[:rows, :cols]
         
-        # Calculate distance from center
         center_dist = np.sqrt((x - ccol)**2 + (y - crow)**2)
         
-        # Normalize to 0-1 range
         center_dist = center_dist / (np.sqrt(crow**2 + ccol**2))
         
-        # Create mask
         mask = np.zeros((rows, cols))
         
         if filter_type == "lpf":
-            # Low-pass filter: 1 for frequencies below cutoff, 0 for frequencies above
             mask = center_dist < cutoff
         elif filter_type == "hpf":
-            # High-pass filter: 0 for frequencies below cutoff, 1 for frequencies above
             mask = center_dist >= cutoff
         
         return mask.astype(float)
     
     def apply_lpf(self, image, cutoff):
-        """
-        Apply low-pass filter to an image.
-        
-        Args:
-            image (numpy.ndarray): Input image
-            cutoff (float): Cutoff frequency (0-1)
-            
-        Returns:
-            numpy.ndarray: Filtered image
-        """
-        # Handle multi-channel images
         if len(image.shape) == 3:
             result = np.zeros_like(image, dtype=float)
             for channel in range(image.shape[2]):
@@ -130,17 +80,6 @@ class ImageFT:
         return np.clip(result, 0, 255).astype(np.uint8)
     
     def apply_hpf(self, image, cutoff):
-        """
-        Apply high-pass filter to an image.
-        
-        Args:
-            image (numpy.ndarray): Input image
-            cutoff (float): Cutoff frequency (0-1)
-            
-        Returns:
-            numpy.ndarray: Filtered image
-        """
-        # Handle multi-channel images
         if len(image.shape) == 3:
             result = np.zeros_like(image, dtype=float)
             for channel in range(image.shape[2]):
@@ -151,30 +90,20 @@ class ImageFT:
         return np.clip(result, 0, 255).astype(np.uint8)
     
     def _apply_filter_to_channel(self, channel, cutoff, filter_type):
-        """
-        Apply filter to a single image channel.
+        key = hash(channel.tobytes())
+        if key in Images().cache:
+            f_shift = Images().cache[key]
+        else:
+            f_transform = fftpack.fft2(channel)
+            f_shift = fftpack.fftshift(f_transform) # Shift zero frequency component to center
+            Images().cache[key] = f_shift
         
-        Args:
-            channel (numpy.ndarray): Single channel image
-            cutoff (float): Cutoff frequency (0-1)
-            filter_type (str): Either "lpf" or "hpf"
-            
-        Returns:
-            numpy.ndarray: Filtered channel
-        """
-        # Apply 2D FFT
-        f_transform = fftpack.fft2(channel)
-        f_shift = fftpack.fftshift(f_transform)
-        
-        # Create and apply mask
         mask = self._create_frequency_mask(channel.shape, cutoff, filter_type)
         f_filtered = f_shift * mask
         
-        # Inverse shift and transform
         f_ishift = fftpack.ifftshift(f_filtered)
         img_back = fftpack.ifft2(f_ishift)
         
-        # Get the real part and convert back to spatial domain
         img_filtered = np.abs(img_back)
         
         return img_filtered
@@ -191,43 +120,22 @@ class ImageFT:
         return padded1, padded2
     
     def mix_images(self, img1, img2, cutoff_lpf, cutoff_hpf):
-        """
-        Mix two images by applying a low-pass filter to the first image
-        and a high-pass filter to the second image, then combining them.
-        
-        Args:
-            img1 (numpy.ndarray): First image (will be low-pass filtered)
-            img2 (numpy.ndarray): Second image (will be high-pass filtered)
-            cutoff (float): Cutoff frequency (0-1)
-            
-        Returns:
-            numpy.ndarray: Mixed image
-        """
         cutoff_hpf = cutoff_lpf
-        # Ensure images have the same size
         img1_resized,img2_resized = self._resize_to_match(img1, img2)
             
-        # Apply filters
         low_passed = self.apply_lpf(img1_resized, cutoff_lpf)
         high_passed = self.apply_hpf(img2_resized, cutoff_hpf)
         
-        # Combine images
-        if len(img1_resized.shape) == 3:  # Color images
+        if len(img1_resized.shape) == 3:
             result = np.zeros_like(low_passed, dtype=float)
             for channel in range(low_passed.shape[2]):
                 result[:,:,channel] = low_passed[:,:,channel] + high_passed[:,:,channel]
-        else:  # Grayscale images
+        else:  
             result = low_passed + high_passed
             
         return np.clip(result, 0, 255).astype(np.uint8)
         
     def handel_mix_images(self,freq1,freq2):
-        # # pub.sendMessage("start Loading")
-        # # Create a thread pool executor
-        # executor = concurrent.futures.ThreadPoolExecutor()
-        # loop = asyncio.get_event_loop()
-        # # Run the CPU-intensive task in a separate thread
-        # loop.run_in_executor(executor, self.mix_images_sync, freq1, freq2)
         self.mix_images_sync(freq1, freq2)
 
 
@@ -243,12 +151,6 @@ class ImageFT:
         Images().output1 = output
         pub.sendMessage("update display")
     def handel_freq_filter(self, cutoff):
-        # pub.sendMessage("start Loading")
-        # # Create a thread pool executor
-        # executor = concurrent.futures.ThreadPoolExecutor()
-        # loop = asyncio.get_event_loop()
-        # # Run the CPU-intensive task in a separate thread
-        # loop.run_in_executor(executor, self.apply_filters, cutoff)
         self.apply_filters(cutoff)
 
     def apply_filters(self, cutoff):
@@ -265,9 +167,8 @@ class ImageFT:
     
     def convert_to_grayscale(self, image):
         if len(image.shape) == 2:
-            return image  # Already grayscale
+            return image  
             
-        # Convert RGB to grayscale using luminosity method
         weights = np.array([0.2989, 0.5870, 0.1140])
         grayscale = np.dot(image[..., :3], weights)
         return grayscale.astype(np.uint8)
@@ -286,4 +187,5 @@ class ImageFT:
             Images().image2 = output
 
         pub.sendMessage("update display")
+        pub.sendMessage("update_output")
     

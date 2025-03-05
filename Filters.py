@@ -172,7 +172,13 @@ def apply_gaussian_filter(qimage, sigma=2.0):
     out = np.empty_like(arr)
     
     for c in range(channels):
-        img_freq = np.fft.fft2(arr[:,:,c])
+        key = hash(arr[:,:,c].tobytes())
+        if key in Images().cache:
+            img_freq = Images().cache[key]
+        else:
+            img_freq = np.fft.fft2(arr[:,:,c])
+            Images().cache[key] = img_freq
+
         filtered_freq = img_freq * kernel_freq
         out[:,:,c] = np.real(np.fft.ifft2(filtered_freq))
     
@@ -203,7 +209,12 @@ def apply_average_filter(qimage, size=7):
     out = np.empty_like(arr)
     
     for c in range(channels):
-        img_freq = np.fft.fft2(arr[:,:,c])
+        key = hash(arr[:,:,c].tobytes())
+        if key in Images().cache:
+            img_freq = Images().cache[key]
+        else:
+            img_freq = np.fft.fft2(arr[:,:,c])
+            Images().cache[key] = img_freq
         filtered_freq = img_freq * kernel_freq
         out[:,:,c] = np.real(np.fft.ifft2(filtered_freq))
     
@@ -233,7 +244,13 @@ def apply_median_filter(qimage, size=7):
     out = np.empty_like(arr)
 
     for c in range(channels):
-        img_freq = np.fft.fft2(arr[:, :, c])
+        key = hash(arr[:, :, c].tobytes())
+        if key in Images().cache:
+            img_freq = Images().cache[key]
+        else:
+            img_freq = np.fft.fft2(arr[:, :, c])
+            Images().cache[key] = img_freq
+
         filtered_freq = img_freq * kernel_freq
         out[:, :, c] = np.real(np.fft.ifft2(filtered_freq))
 

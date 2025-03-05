@@ -167,8 +167,14 @@ class ImageController:
         image = image.astype(np.float32)
 
         try:
-            ft_components = np.fft.fft2(image)
-            ft_components = np.fft.fftshift(ft_components) 
+            key = hash(image.tobytes())
+            if key in Images().cache:
+                ft_components = Images().cache[key]
+            else:
+                ft_components = np.fft.fft2(image)
+                ft_components = np.fft.fftshift(ft_components) 
+                Images().cache[key] = ft_components
+            
             ft_magnitude = np.log(np.abs(ft_components) + 1)  
             ft_phase = np.angle(ft_components)
 
@@ -244,8 +250,19 @@ class ImageController:
         Ky_padded[:kh, :kw] = Ky
 
         # Compute FFT of the Kernels
-        Kx_fft = np.fft.fft2(Kx_padded)
-        Ky_fft = np.fft.fft2(Ky_padded)
+        key = hash(Kx_padded.tobytes())
+        if key in Images().cache:
+            Kx_fft = Images().cache[key]
+        else:
+            Kx_fft = np.fft.fft2(Kx_padded)
+            Images().cache[key] = Kx_fft
+
+        key = hash(Ky_padded.tobytes())
+        if key in Images().cache:
+            Ky_fft = Images().cache[key]
+        else:
+            Ky_fft = np.fft.fft2(Ky_padded)
+            Images().cache[key] = Ky_fft
 
         # Shift for Proper Convolution
         Kx_fft = np.fft.fftshift(Kx_fft)

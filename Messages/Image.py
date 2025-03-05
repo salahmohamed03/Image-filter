@@ -40,3 +40,4 @@ class Images:
         self.output1:Image = None
         self.output2:Image = None
         self.output3:Image = None
+        self.cache = {}

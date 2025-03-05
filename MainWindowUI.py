@@ -41,6 +41,7 @@ class MainWindowUI(QMainWindow):
         pub.subscribe(self.end_loading, "update display")
         pub.subscribe(self.start_loading, "start Loading")
         pub.subscribe(self.update_histogram, "display_histogram")
+        pub.subscribe(self.update_output, "update_output")
     def start_loading(self):
         self.show_widget(self.ui.LoadingLabel)
         self.isLoading = True
@@ -106,12 +107,16 @@ class MainWindowUI(QMainWindow):
         else:
             self.select_mode(0)
     def update_freq_domain(self):
+        if Images().image1 is None:
+            return
         if not self.ui.freqDomainRadioButton.isChecked():
             return
         pub.sendMessage("Frequency Filters", cutoff = self.ui.cutoffFrequencySlider.value())
         logging.info("Frequency Domain topic published")
 
     def convert_to_grayscale(self):
+        if Images().image1 is None:
+            return
         pub.sendMessage("Grayscale")
         logging.info("Grayscale topic published")
 
@@ -129,6 +134,8 @@ class MainWindowUI(QMainWindow):
         logging.info("Images reset")
 
     def update_noise(self):
+        if Images().image1 is None:
+            return
         if self.isLoading:
             QTimer.singleShot(100, self.update_noise)
             return
@@ -142,6 +149,8 @@ class MainWindowUI(QMainWindow):
         logging.info(f"Add Noise topic published Noise: {noise.noise} Filter: {noise.filter} Salt: {noise.saltRatio} Pepper: {noise.pepperRatio}")
 
     def update_edge_detection(self):
+        if Images().image1 is None:
+            return
         if self.isLoading:
             QTimer.singleShot(100, self.update_edge_detection)
             return
@@ -149,6 +158,8 @@ class MainWindowUI(QMainWindow):
         logging.info(f"Edge Detection topic published Filter: {self.ui.edgeDetectionComboBox.currentText()}")
     
     def update_thresholding(self):
+        if Images().image1 is None:
+            return
         if self.isLoading:
             QTimer.singleShot(100, self.update_thresholding)
             return
@@ -158,6 +169,8 @@ class MainWindowUI(QMainWindow):
 
 
     def update_mix_images(self):
+        if Images().image1 is None:
+            return
         if self.isLoading:
             QTimer.singleShot(100, self.update_mix_images)
             return
@@ -311,7 +324,8 @@ class MainWindowUI(QMainWindow):
             self.ui.mixerModeGroup.setChecked(False)
             self.ui.noiseModeGroup.setChecked(False)
             self.ui.EdgeDetectionGroupBox.setChecked(False)
-
+            if Images().image1 is None:
+                return
             if self.ui.normalizationRadioButton.isChecked():
                 pub.sendMessage("Normalize Image")
                 logging.info("Normalize Image topic published")

@@ -82,7 +82,8 @@ flex-direction:column;
           <item>
            <widget class="QLabel" name="LoadingLabel">
             <property name="styleSheet">
-             <string notr="true">font: 16pt &quot;MS Shell Dlg 2&quot;;</string>
+             <string notr="true">font: 16pt &quot;MS Shell Dlg 2&quot;;
+color:white;</string>
             </property>
             <property name="text">
              <string>Loading...</string>
@@ -178,7 +179,7 @@ flex-direction:column;
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">color:#002333;
+                <string notr="true">color:white;
 font-size:20px;
 </string>
                </property>
@@ -325,7 +326,7 @@ font-size:20px;
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">color:#002333;
+                <string notr="true">color:white;
 font-size:20px;
 </string>
                </property>
@@ -993,7 +994,7 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
             <item>
              <widget class="QRadioButton" name="freqDomainRadioButton">
               <property name="styleSheet">
-                <string notr="true">border:none;
+               <string notr="true">border:none;
                     text-align:center;
                     font-size:15px;
                     color:#DEEFE7;
@@ -1023,12 +1024,14 @@ font: 75 13pt &quot;MS Shell Dlg 2&quot;;</string>
               </item>
               <item>
                <widget class="QSlider" name="cutoffFrequencySlider">
-               <size>
-                    <width>0</width>
-                    <height>50</height>
-                </size>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>20</height>
+                 </size>
+                </property>
                 <property name="styleSheet">
-                <string notr="true">
+                 <string notr="true">
                     border:none;
                     font-weight:bold;
                 </string>
