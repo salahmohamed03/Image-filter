@@ -47,7 +47,7 @@ class ImageController:
 
             for i, (color, channel_name) in enumerate(zip(colors, color_channels)):
                 histogram = self.calculate_histogram(image_data[:, :, i])
-                cdf = np.cumsum(histogram)
+                cdf = self.calculate_cdf(histogram)
                 cdf_min = cdf.min()
                 cdf_max = cdf.max()
                 cdf = ((cdf - cdf_min) / (cdf_max - cdf_min) * 255).astype(np.uint8)
@@ -93,11 +93,10 @@ class ImageController:
         image_data =cv2.cvtColor(image_data, cv2.COLOR_BGR2GRAY)
         
         histogram = self.calculate_histogram(image_data)
-        cdf = np.cumsum(histogram)
+        cdf = self.calculate_cdf(histogram)
         cdf_min = cdf.min()
         cdf_max = cdf.max()
         normalized_cdf = ((cdf - cdf_min) / (cdf_max - cdf_min) * 255).astype(np.uint8)
-        
 
         equalized_image = normalized_cdf[image_data]
         equalized_image = cv2.cvtColor(equalized_image, cv2.COLOR_GRAY2BGR)
@@ -109,7 +108,16 @@ class ImageController:
         logging.info("Update display published from equalization")
         pub.sendMessage("update display")
 
-    
+    def calculate_cdf(self, histogram):
+        # Instead of 2D for loop, we can use tabulation to calculate CDF
+        cdf = np.zeros_like(histogram) 
+        cdf[0] = histogram[0]  
+        
+        for i in range(1, len(histogram)):
+            cdf[i] = cdf[i-1] + histogram[i]
+            
+        return cdf
+
     def calculate_histogram(self, image_data):
         histogram = np.zeros(256, dtype=np.int32)
         for pixel in image_data.flatten():
