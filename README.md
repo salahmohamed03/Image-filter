@@ -1,9 +1,5 @@
 # Image Filter
 
-![Hero Image](https://github.com/user-attachments/assets/23945e2e-2be3-4da3-9d14-ebe9f9b74051)
-
----
-
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Features & Screenshots](#features--screenshots)
@@ -29,7 +25,7 @@ The **Mixer Mode** allows users to blend two images using **frequency-domain man
 
 | Snapshot | Description |
 |----------|-------------|
-| ![Mixer Mode](https://github.com/user-attachments/assets/71e51a77-c0a9-4d0a-bad3-16077b44164b) | Blend two images using frequency-domain manipulation with adjustable cutoff sliders. |
+| ![image](https://github.com/user-attachments/assets/1106fcc8-1914-4c0b-a5d9-26160338f037) | Blend two images using frequency-domain manipulation with adjustable cutoff sliders. |
 
 ---
 ### Edge Detection  
@@ -37,10 +33,14 @@ The **Edge Detection Mode** implements classical edge detection algorithms, incl
 
 | Edge Detection Method | Snapshot | Description |
 |-----------------------|----------|-------------|
-| Sobel | ![Sobel](https://github.com/user-attachments/assets/86d01db2-4ea3-44ab-9ed4-19552ca5002d) | Detects edges using gradient approximation. |
-| Prewitt | ![Prewitt](https://github.com/user-attachments/assets/753bf712-e78c-4035-8c48-c0d6a4a5e1df) | Similar to Sobel but with a different kernel. |
-| Roberts | ![Roberts](https://github.com/user-attachments/assets/868a1936-82c2-49b6-8686-f8f80701144c) | Detects edges using diagonal gradients. |
-| Canny | ![Canny](https://github.com/user-attachments/assets/7ef6e5b4-4059-4cee-912b-7daf522a1369) | A multi-stage algorithm for optimal edge detection. |
+| Sobel | ![image](https://github.com/user-attachments/assets/f2ad30bb-51de-404e-8e2d-facfb8e32959)
+ | Detects edges using gradient approximation. |
+| Prewitt |![image](https://github.com/user-attachments/assets/c88f2d5d-3a6c-43d7-aef1-93e8194ebdad)
+ | Similar to Sobel but with a different kernel. |
+| Roberts | ![image](https://github.com/user-attachments/assets/9023efdf-7638-433e-be66-13abf469526d)
+ | Detects edges using diagonal gradients. |
+| Canny | ![image](https://github.com/user-attachments/assets/ae252113-fbb9-47c5-8b34-35f6e1f5612c)
+ | A multi-stage algorithm for optimal edge detection. |
 
 ---
 ### Noise Mode  
@@ -48,9 +48,11 @@ The **Noise Mode** simulates various types of noise, including **Gaussian**, **U
 
 | Noise Type | Snapshot | Description |
 |------------|----------|-------------|
-| Gaussian Noise | ![Gaussian Noise](https://github.com/user-attachments/assets/0ecbbb8d-c5f6-432c-980f-0927788b46b2) | Simulates additive Gaussian noise, commonly used to model sensor noise. |
-| Uniform Noise | ![Uniform Noise](https://github.com/user-attachments/assets/15d74b9f-7a37-4a02-a6cc-3aeb3395cdd5) | Simulates uniform noise, often used in statistical simulations. |
-| Salt & Pepper Noise | ![Salt & Pepper](https://github.com/user-attachments/assets/43a87ed9-39ac-4d64-9583-aca5279111bd) | Simulates impulsive noise, typical in corrupted images. |
+| Gaussian Noise | ![image](https://github.com/user-attachments/assets/06911f84-f888-4182-95c4-2f34cd93ce1e)
+ | Simulates additive Gaussian noise, commonly used to model sensor noise. |
+| Uniform Noise | ![image](https://github.com/user-attachments/assets/001a5180-c1a4-4455-ab12-f043bd16b66d)
+| Simulates uniform noise, often used in statistical simulations. |
+| Salt & Pepper Noise | ![image](https://github.com/user-attachments/assets/13d48f82-b14c-41ce-9304-e03cac4bf92e) | Simulates impulsive noise, typical in corrupted images. |
 
 ---
 
