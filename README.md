@@ -1,5 +1,9 @@
 # Image Filter
 
+![Hero Image](https://github.com/user-attachments/assets/a2db8c0b-1878-4a7c-a507-ea9fa985ce3e)
+
+---
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Features & Screenshots](#features--screenshots)
@@ -25,7 +29,7 @@ The **Mixer Mode** allows users to blend two images using **frequency-domain man
 
 | Snapshot | Description |
 |----------|-------------|
-| ![image](https://github.com/user-attachments/assets/1106fcc8-1914-4c0b-a5d9-26160338f037) | Blend two images using frequency-domain manipulation with adjustable cutoff sliders. |
+| ![Mixer Mode](https://github.com/user-attachments/assets/e069bfc4-9c2c-4921-85dc-3fe384f70a74) | Blend two images using frequency-domain manipulation with adjustable cutoff sliders. |
 
 ---
 ### Edge Detection  
@@ -33,14 +37,10 @@ The **Edge Detection Mode** implements classical edge detection algorithms, incl
 
 | Edge Detection Method | Snapshot | Description |
 |-----------------------|----------|-------------|
-| Sobel | ![image](https://github.com/user-attachments/assets/f2ad30bb-51de-404e-8e2d-facfb8e32959)
- | Detects edges using gradient approximation. |
-| Prewitt |![image](https://github.com/user-attachments/assets/c88f2d5d-3a6c-43d7-aef1-93e8194ebdad)
- | Similar to Sobel but with a different kernel. |
-| Roberts | ![image](https://github.com/user-attachments/assets/9023efdf-7638-433e-be66-13abf469526d)
- | Detects edges using diagonal gradients. |
-| Canny | ![image](https://github.com/user-attachments/assets/ae252113-fbb9-47c5-8b34-35f6e1f5612c)
- | A multi-stage algorithm for optimal edge detection. |
+| Sobel | ![Sobel](https://github.com/user-attachments/assets/2c2cf097-2c6b-4b2f-a537-1a146226693f) | Detects edges using gradient approximation. |
+| Prewitt | ![Prewitt](https://github.com/user-attachments/assets/d0018c20-c3a9-4f9e-9e8e-eb85d09d3e7e) | Similar to Sobel but with a different kernel. |
+| Roberts | ![Roberts](https://github.com/user-attachments/assets/00bf1454-272f-425e-ab90-df58216e8779) | Detects edges using diagonal gradients. |
+| Canny | ![Canny](https://github.com/user-attachments/assets/6a1bd53a-2be6-4287-a774-660863b46946) | A multi-stage algorithm for optimal edge detection. |
 
 ---
 ### Noise Mode  
@@ -48,11 +48,9 @@ The **Noise Mode** simulates various types of noise, including **Gaussian**, **U
 
 | Noise Type | Snapshot | Description |
 |------------|----------|-------------|
-| Gaussian Noise | ![image](https://github.com/user-attachments/assets/06911f84-f888-4182-95c4-2f34cd93ce1e)
- | Simulates additive Gaussian noise, commonly used to model sensor noise. |
-| Uniform Noise | ![image](https://github.com/user-attachments/assets/001a5180-c1a4-4455-ab12-f043bd16b66d)
-| Simulates uniform noise, often used in statistical simulations. |
-| Salt & Pepper Noise | ![image](https://github.com/user-attachments/assets/13d48f82-b14c-41ce-9304-e03cac4bf92e) | Simulates impulsive noise, typical in corrupted images. |
+| Gaussian Noise | ![Gaussian Noise](https://github.com/user-attachments/assets/0a60be6c-9185-46f1-ae68-f91200659390) | Simulates additive Gaussian noise, commonly used to model sensor noise. |
+| Uniform Noise | ![Uniform Noise](https://github.com/user-attachments/assets/879cee6d-67ce-498c-82c8-a69806fe2538) | Simulates uniform noise, often used in statistical simulations. |
+| Salt & Pepper Noise | ![Salt & Pepper](https://github.com/user-attachments/assets/79cac0fd-5aa9-4fea-a778-c46471d047d3) | Simulates impulsive noise, typical in corrupted images. |
 
 ---
 
@@ -61,9 +59,9 @@ The **Filter Mode** provides tools to apply **spatial-domain filters** such as *
 
 | Filter Type | Snapshot | Description |
 |-------------|----------|-------------|
-| Average Filter | ![Average Filter](https://github.com/user-attachments/assets/c82948b8-fb91-4411-b2cf-1f6c44d98789) | Applies a simple averaging filter to smooth the image. |
-| Gaussian Filter | ![Gaussian Filter](https://github.com/user-attachments/assets/42218d6b-8101-4799-8bd3-9f2b6a7aee1d) | Applies a Gaussian kernel for noise reduction while preserving edges. |
-| Median Filter | ![Median Filter](https://github.com/user-attachments/assets/d5cd1d6f-a232-4b1e-b9da-93fddfc8416b) | Removes salt and pepper noise by replacing each pixel with the median of its neighborhood. |
+| Average Filter | ![Average Filter](https://github.com/user-attachments/assets/6f0bf661-fe74-4fb3-bdc5-8c3f4ab9e87f) | Applies a simple averaging filter to smooth the image. |
+| Gaussian Filter | ![Gaussian Filter](https://github.com/user-attachments/assets/70c2197d-2bd8-4c8e-8cd6-036d8754e73d) | Applies a Gaussian kernel for noise reduction while preserving edges. |
+| Median Filter | ![Median Filter](https://github.com/user-attachments/assets/97732206-bf73-48e3-9b72-4c849fed0213) | Removes salt and pepper noise by replacing each pixel with the median of its neighborhood. |
 
 ---
 
@@ -73,10 +71,10 @@ The **Other Modes** section includes advanced tools for **intensity normalizatio
 
 | Mode | Snapshot | Description |
 |------|----------|-------------|
-| Normalization | ![Normalization](https://github.com/user-attachments/assets/a78f39c8-446a-4516-b7f3-0d151be6f076) | Normalizes pixel intensities for better contrast. |
-| Thresholding | ![Thresholding](https://github.com/user-attachments/assets/ef74dc5c-1aca-488e-a2bd-06b27fb423d0) | Applies binary thresholding to segment images. |
-| Histogram & CDF | ![Histogram](https://github.com/user-attachments/assets/499d3d15-2a48-4065-8c89-2938a7b81e6c) | Analyzes image histograms and cumulative distribution functions. |
-| Frequency Filtering | ![Filtering](https://github.com/user-attachments/assets/5dfbc25b-0f07-4e80-ad76-c8cb865af36e) | Applies frequency-domain filters for advanced image manipulation. |
+| Normalization | ![Normalization](https://github.com/user-attachments/assets/082cd1f9-d8ab-4e84-bebb-9392213bc507) | Normalizes pixel intensities for better contrast. |
+| Thresholding | ![Thresholding](https://github.com/user-attachments/assets/445a0475-195b-4f64-a523-379390629c8d) | Applies binary thresholding to segment images. |
+| Histogram & CDF | ![Histogram](https://github.com/user-attachments/assets/56599d59-fa3c-4d96-9512-2e5caca63a16) | Analyzes image histograms and cumulative distribution functions. |
+| Frequency Filtering | ![Filtering](https://github.com/user-attachments/assets/7e2c16dc-c63e-4837-a665-88905e45931e) | Applies frequency-domain filters for advanced image manipulation. |
 
 ---
 
